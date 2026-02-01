@@ -17,11 +17,6 @@ import {
   Target
 } from 'lucide-react';
 
-export const metadata = {
-  title: "OBM HQ | Olsen Brands Management",
-  robots: "noindex, nofollow",
-};
-
 const statsCards = [
   {
     title: "Active Ventures",
