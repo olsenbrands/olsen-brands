@@ -12,11 +12,13 @@ import {
   X,
   Clock,
   Calendar,
-  ArrowLeft
+  ArrowLeft,
+  CheckSquare
 } from 'lucide-react';
 
 const navItems = [
   { href: '/operation-little-wiggles', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/operation-little-wiggles/tasks', label: 'Tasks', icon: CheckSquare },
   { href: '/operation-little-wiggles/missions', label: 'Missions', icon: Target },
   { href: '/operation-little-wiggles/brainstorm', label: 'Brainstorm', icon: Lightbulb },
 ];
