@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -30,7 +30,15 @@ export default function HQLayout({
   children: React.ReactNode;
 }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [isDesktop, setIsDesktop] = useState(false);
   const pathname = usePathname();
+
+  useEffect(() => {
+    const check = () => setIsDesktop(window.innerWidth >= 1024);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, []);
 
   const getCurrentDateTime = () => {
     const now = new Date();
@@ -56,10 +64,10 @@ export default function HQLayout({
       {/* Sidebar */}
       <AnimatePresence>
         <motion.div
-          initial={{ x: -280 }}
-          animate={{ x: sidebarOpen ? 0 : -280 }}
+          initial={{ x: isDesktop ? 0 : -280 }}
+          animate={{ x: (isDesktop || sidebarOpen) ? 0 : -280 }}
           transition={{ type: "spring", damping: 25, stiffness: 200 }}
-          className="fixed inset-y-0 left-0 z-50 w-70 bg-[var(--bg-secondary)] border-r border-[var(--border)] lg:relative lg:translate-x-0 lg:block"
+          className={`fixed inset-y-0 left-0 z-50 w-70 bg-[var(--bg-secondary)] border-r border-[var(--border)] ${isDesktop ? 'relative' : ''}`}
         >
           <div className="flex flex-col h-full">
             {/* Header */}
