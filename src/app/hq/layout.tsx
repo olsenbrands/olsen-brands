@@ -13,7 +13,8 @@ import {
   Menu,
   X,
   Clock,
-  Calendar
+  Calendar,
+  ArrowLeft
 } from 'lucide-react';
 
 const navItems = [
@@ -109,9 +110,15 @@ export default function HQLayout({
             </nav>
 
             {/* Footer */}
-            <div className="p-4 border-t border-[var(--border)] text-xs text-[var(--text-muted)]">
-              <p>© 2025 Olsen Brands</p>
-              <p>Management System v2.1</p>
+            <div className="p-4 border-t border-[var(--border)]">
+              <Link
+                href="/"
+                className="flex items-center gap-2 px-4 py-2 rounded-lg text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] hover:bg-[var(--bg-tertiary)] transition-colors"
+              >
+                <ArrowLeft size={16} />
+                Back to site
+              </Link>
+              <p className="text-xs text-[var(--text-muted)] mt-3 px-4">© 2025 Olsen Brands</p>
             </div>
           </div>
         </motion.div>
