@@ -1,0 +1,95 @@
+{
+  "ventures": [
+    {
+      "id": "wedgies-clinton",
+      "name": "Wedgie's Clinton",
+      "type": "restaurant",
+      "brand": "Wedgie's",
+      "location": "Clinton, UT",
+      "ownership": "owned",
+      "realEstate": "owned",
+      "status": "active",
+      "flagship": true
+    },
+    {
+      "id": "fiiz-clinton",
+      "name": "FiiZ Clinton",
+      "type": "restaurant",
+      "brand": "FiiZ Drinks",
+      "location": "Clinton, UT",
+      "ownership": "franchise",
+      "realEstate": "owned",
+      "status": "active"
+    },
+    {
+      "id": "fiiz-kaysville-east",
+      "name": "FiiZ Kaysville East",
+      "type": "restaurant",
+      "brand": "FiiZ Drinks",
+      "location": "Kaysville, UT",
+      "ownership": "franchise",
+      "realEstate": "leased",
+      "status": "active"
+    },
+    {
+      "id": "fiiz-kaysville-west",
+      "name": "FiiZ Kaysville West",
+      "type": "restaurant",
+      "brand": "FiiZ Drinks",
+      "location": "Kaysville, UT",
+      "ownership": "franchise",
+      "realEstate": "leased",
+      "status": "active"
+    },
+    {
+      "id": "subway-kaysville",
+      "name": "Subway Kaysville",
+      "type": "restaurant",
+      "brand": "Subway",
+      "location": "Kaysville, UT",
+      "ownership": "franchise",
+      "realEstate": "owned",
+      "status": "active",
+      "notes": "Converting to Wedgie's Summer 2026"
+    },
+    {
+      "id": "subway-ogden",
+      "name": "Subway Ogden",
+      "type": "restaurant",
+      "brand": "Subway",
+      "location": "Ogden, UT (Walmart)",
+      "ownership": "franchise",
+      "realEstate": "leased",
+      "status": "active"
+    },
+    {
+      "id": "subway-morgan",
+      "name": "Subway Morgan",
+      "type": "restaurant",
+      "brand": "Subway",
+      "location": "Morgan, UT",
+      "ownership": "franchise",
+      "realEstate": "leased",
+      "status": "active"
+    },
+    {
+      "id": "on-chord",
+      "name": "On Chord Academy",
+      "type": "education",
+      "brand": "On Chord Academy",
+      "location": "Layton, UT",
+      "ownership": "owned",
+      "realEstate": "leased",
+      "status": "active",
+      "partner": "John Chatlyn",
+      "founded": 2013
+    }
+  ],
+  "summary": {
+    "totalVentures": 8,
+    "ownedRealEstate": 3,
+    "leasedRealEstate": 5,
+    "restaurants": 7,
+    "education": 1
+  }
+}
