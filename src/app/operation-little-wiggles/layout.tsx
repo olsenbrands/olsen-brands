@@ -171,38 +171,30 @@ export default function OLWLayout({
       <div className="flex-1 flex flex-col" style={{ background: 'var(--olw-bg-primary)' }}>
         {/* Top Bar */}
         <header 
-          className="bg-white border-b p-4 shadow-sm"
+          className="bg-white border-b px-3 py-2 shadow-sm"
           style={{ borderColor: 'var(--olw-border)' }}
         >
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2">
               <button
                 onClick={() => setSidebarOpen(true)}
                 className="lg:hidden p-2 rounded-lg transition-colors hover:bg-gray-100"
               >
-                <Menu size={20} style={{ color: 'var(--olw-text-secondary)' }} />
+                <Menu size={18} style={{ color: 'var(--olw-text-secondary)' }} />
               </button>
-              <div className="flex items-center gap-3">
-                <span className="text-2xl">🐛</span>
-                <h1 className="text-xl font-bold hidden sm:block" style={{ color: 'var(--olw-text-primary)' }}>
-                  OPERATION LITTLE WIGGLES
-                </h1>
-                <h1 className="text-lg font-bold sm:hidden" style={{ color: 'var(--olw-text-primary)' }}>
-                  OLW
-                </h1>
-              </div>
+              <span className="text-xl">🐛</span>
+              <h1 className="text-base font-bold hidden sm:block" style={{ color: 'var(--olw-text-primary)' }}>
+                OPERATION LITTLE WIGGLES
+              </h1>
+              <h1 className="text-base font-bold sm:hidden" style={{ color: 'var(--olw-text-primary)' }}>
+                OLW
+              </h1>
             </div>
             
-            <div className="flex items-center gap-4 text-sm">
-              <div className="flex items-center gap-2" style={{ color: 'var(--olw-text-secondary)' }}>
-                <Calendar size={16} />
-                <span>{date}</span>
-              </div>
-              <div className="flex items-center gap-2" style={{ color: 'var(--olw-text-primary)' }}>
-                <Clock size={16} />
-                <span className="font-mono">{time}</span>
-                <span className="text-xs" style={{ color: 'var(--olw-text-muted)' }}>MT</span>
-              </div>
+            <div className="flex items-center gap-1 text-xs flex-shrink-0" style={{ color: 'var(--olw-text-secondary)' }}>
+              <span>{date}</span>
+              <span>·</span>
+              <span className="font-mono">{time}</span>
             </div>
           </div>
         </header>
