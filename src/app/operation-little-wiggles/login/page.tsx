@@ -74,6 +74,9 @@ function LoginForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="Password"
                 autoFocus
+                autoCapitalize="off"
+                autoCorrect="off"
+                spellCheck={false}
                 className="w-full px-4 py-3 pr-12 bg-gray-50 border border-gray-200 rounded-lg text-gray-800 placeholder-gray-400 focus:outline-none focus:border-teal-400 focus:ring-2 focus:ring-teal-100"
               />
               <button
