@@ -336,7 +336,7 @@ export default function HQPage() {
                 
                 <div className="flex items-center justify-between text-xs">
                   <span className="text-[var(--text-muted)]">
-                    {assistant.telegram}
+                    {assistant.capabilities.join(' • ')}
                   </span>
                   <div className={`flex items-center gap-1 ${
                     assistant.status === 'active' ? 'text-green-400' : 'text-gray-400'

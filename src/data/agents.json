@@ -6,9 +6,6 @@
       "emoji": "🦞",
       "role": "Primary AI Assistant",
       "status": "active",
-      "gateway": "~/.clawdbot/",
-      "port": 58064,
-      "telegram": "@SteveMoltbot",
       "capabilities": ["research", "coding", "scheduling", "communications"],
       "description": "Jordan's main AI assistant. Handles development, research, and daily operations."
     },
@@ -18,9 +15,6 @@
       "emoji": "🤖",
       "role": "HR & Recruiting",
       "status": "active",
-      "gateway": "~/.clawdbot-erica/",
-      "port": 18789,
-      "telegram": "@EricaMoltbot",
       "capabilities": ["recruiting", "hr", "applications"],
       "description": "Handles Clinton Comeback applications and hiring pipeline."
     }
