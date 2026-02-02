@@ -40,9 +40,10 @@ export async function GET() {
   const activities: ActivityItem[] = [];
 
   // Fetch recent commits from GitHub repos
+  // Note: Add GITHUB_TOKEN env var to include private repos
   const repos = [
-    'olsenbrands/olsen-brands',
-    'olsenbrands/clinton-comeback'
+    'olsenbrands/olsen-brands'
+    // 'olsenbrands/Clinton-Comeback' // Private - needs token
   ];
 
   for (const repo of repos) {
