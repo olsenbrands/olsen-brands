@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, Reorder, useDragControls } from 'framer-motion';
 import {
   Plus,
   X,
@@ -13,6 +13,7 @@ import {
   PlayCircle,
   CheckCircle,
   ArrowLeft,
+  GripVertical,
 } from 'lucide-react';
 
 // Types
@@ -68,7 +69,7 @@ const initialTasks: Task[] = [
   { id: 'olw-8', title: 'Build Operation Little Wiggles hub', description: "Mission control for the Victory project. You're looking at it right now! 🐛", assignee: 'jordan', priority: 'high', category: 'website', status: 'doing' },
 ];
 
-// Task Card Component
+// Task Card Component (wrapped in Reorder.Item)
 function TaskCard({
   task,
   isExpanded,
@@ -82,53 +83,65 @@ function TaskCard({
 }) {
   const CategoryIcon = categories[task.category].icon;
   const config = statusConfig[task.status];
+  const dragControls = useDragControls();
 
   return (
-    <motion.div
-      layout
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
+    <Reorder.Item
+      value={task}
+      dragListener={false}
+      dragControls={dragControls}
       className="bg-white rounded-xl border shadow-sm overflow-hidden"
       style={{ borderColor: '#d1e3e6' }}
+      whileDrag={{ scale: 1.02, boxShadow: '0 8px 25px rgba(0,0,0,0.15)', zIndex: 50 }}
     >
       {/* Compact Header - Always visible */}
-      <button
-        onClick={onToggle}
-        className="w-full p-4 flex items-center gap-3 text-left"
-        style={{ minHeight: '64px' }}
-      >
-        {/* Priority Dot */}
+      <div className="flex items-center">
+        {/* Drag Handle */}
         <div
-          className="w-3 h-3 rounded-full flex-shrink-0"
-          style={{ backgroundColor: priorities[task.priority].color }}
-        />
-        
-        {/* Title & Category */}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-medium text-gray-800 truncate pr-2" style={{ fontSize: '15px' }}>
-            {task.title}
-          </h3>
+          onPointerDown={(e) => {
+            e.preventDefault();
+            dragControls.start(e);
+          }}
+          className="flex items-center justify-center pl-2 pr-0 py-3 cursor-grab active:cursor-grabbing touch-none"
+          style={{ minWidth: '32px', minHeight: '48px' }}
+        >
+          <GripVertical size={16} className="text-gray-300" />
         </div>
 
-        {/* Category Icon */}
-        <CategoryIcon
-          size={18}
-          className="flex-shrink-0"
-          style={{ color: categories[task.category].color }}
-        />
-
-        {/* Assignee Emoji */}
-        <span className="text-lg flex-shrink-0">{assignees[task.assignee].emoji}</span>
-
-        {/* Expand Indicator */}
-        <motion.div
-          animate={{ rotate: isExpanded ? 180 : 0 }}
-          transition={{ duration: 0.2 }}
+        <button
+          onClick={onToggle}
+          className="flex-1 py-3 pr-3 pl-1 flex items-center gap-2 text-left"
+          style={{ minHeight: '48px' }}
         >
-          <ChevronDown size={18} className="text-gray-400" />
-        </motion.div>
-      </button>
+          {/* Priority Dot */}
+          <div
+            className="w-2.5 h-2.5 rounded-full flex-shrink-0"
+            style={{ backgroundColor: priorities[task.priority].color }}
+          />
+          
+          {/* Title */}
+          <div className="flex-1 min-w-0">
+            <h3 className="font-medium text-gray-800 truncate" style={{ fontSize: '14px' }}>
+              {task.title}
+            </h3>
+          </div>
+
+          {/* Category Icon */}
+          <CategoryIcon
+            size={16}
+            className="flex-shrink-0"
+            style={{ color: categories[task.category].color }}
+          />
+
+          {/* Expand chevron */}
+          <motion.div
+            animate={{ rotate: isExpanded ? 180 : 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            <ChevronDown size={16} className="text-gray-400" />
+          </motion.div>
+        </button>
+      </div>
 
       {/* Expanded Content */}
       <AnimatePresence>
@@ -139,25 +152,26 @@ function TaskCard({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.2 }}
           >
-            <div className="px-4 pb-4 border-t" style={{ borderColor: '#e8f4f6' }}>
+            <div className="px-3 pb-3 border-t" style={{ borderColor: '#e8f4f6' }}>
               {/* Description */}
-              <p className="text-gray-600 text-sm mt-3 mb-4 leading-relaxed">
+              <p className="text-gray-600 text-sm mt-2 mb-3 leading-relaxed">
                 {task.description}
               </p>
 
               {/* Meta Info */}
-              <div className="flex items-center gap-3 mb-4 text-xs">
+              <div className="flex items-center gap-2 mb-3 text-xs">
+                <span className="text-lg">{assignees[task.assignee].emoji}</span>
                 <span
-                  className="px-2 py-1 rounded-full"
+                  className="px-2 py-0.5 rounded-full"
                   style={{
                     backgroundColor: `${priorities[task.priority].color}15`,
                     color: priorities[task.priority].color,
                   }}
                 >
-                  {priorities[task.priority].label} Priority
+                  {priorities[task.priority].label}
                 </span>
                 <span
-                  className="px-2 py-1 rounded-full"
+                  className="px-2 py-0.5 rounded-full"
                   style={{
                     backgroundColor: `${categories[task.category].color}15`,
                     color: categories[task.category].color,
@@ -175,14 +189,14 @@ function TaskCard({
                       e.stopPropagation();
                       onStatusChange(task.id, config.prevStatus!);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg border text-sm font-medium transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg border text-sm font-medium transition-colors"
                     style={{
                       borderColor: '#d1e3e6',
                       color: '#5c6a6d',
-                      minHeight: '48px',
+                      minHeight: '44px',
                     }}
                   >
-                    <ArrowLeft size={16} />
+                    <ArrowLeft size={14} />
                     {config.prevAction}
                   </button>
                 )}
@@ -192,22 +206,16 @@ function TaskCard({
                       e.stopPropagation();
                       onStatusChange(task.id, config.nextStatus!);
                     }}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-white text-sm font-medium transition-colors"
+                    className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white text-sm font-medium transition-colors"
                     style={{
                       backgroundColor: task.status === 'doing' ? '#22c55e' : '#ff0000',
-                      minHeight: '48px',
+                      minHeight: '44px',
                     }}
                   >
                     {task.status === 'todo' ? (
-                      <>
-                        <PlayCircle size={16} />
-                        {config.nextAction}
-                      </>
+                      <><PlayCircle size={14} />{config.nextAction}</>
                     ) : (
-                      <>
-                        <CheckCircle size={16} />
-                        {config.nextAction}
-                      </>
+                      <><CheckCircle size={14} />{config.nextAction}</>
                     )}
                   </button>
                 )}
@@ -216,7 +224,7 @@ function TaskCard({
           </motion.div>
         )}
       </AnimatePresence>
-    </motion.div>
+    </Reorder.Item>
   );
 }
 
@@ -427,14 +435,22 @@ export default function TasksPage() {
     setActiveTab('todo');
   };
 
+  const handleReorder = (reordered: Task[]) => {
+    // Update the full task list preserving order for this tab
+    setTasks((prev) => {
+      const otherTasks = prev.filter((t) => t.status !== activeTab);
+      return [...reordered, ...otherTasks];
+    });
+  };
+
   return (
-    <div className="min-h-full flex flex-col" style={{ background: '#f4fafb' }}>
-      {/* Sticky Tab Bar */}
+    <div className="h-[calc(100vh-64px)] flex flex-col overflow-hidden" style={{ background: '#f4fafb' }}>
+      {/* Tab Bar */}
       <div
-        className="sticky top-0 z-10 bg-white border-b px-4 py-3"
+        className="flex-shrink-0 bg-white border-b px-3 py-2"
         style={{ borderColor: '#d1e3e6' }}
       >
-        <div className="flex gap-2 max-w-3xl mx-auto">
+        <div className="flex gap-1.5 max-w-3xl mx-auto">
           {(['todo', 'doing', 'done'] as Status[]).map((status) => (
             <button
               key={status}
@@ -442,17 +458,17 @@ export default function TasksPage() {
                 setActiveTab(status);
                 setExpandedId(null);
               }}
-              className="flex-1 flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-sm font-medium transition-all"
+              className="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 rounded-lg text-sm font-medium transition-all"
               style={{
                 backgroundColor: activeTab === status ? '#ff0000' : 'white',
                 color: activeTab === status ? 'white' : '#5c6a6d',
                 border: activeTab === status ? 'none' : '1px solid #d1e3e6',
-                minHeight: '44px',
+                minHeight: '40px',
               }}
             >
               <span>{statusConfig[status].label}</span>
               <span
-                className="px-2 py-0.5 rounded-full text-xs font-semibold"
+                className="px-1.5 py-0.5 rounded-full text-xs font-semibold"
                 style={{
                   backgroundColor: activeTab === status ? 'rgba(255,255,255,0.2)' : '#f4fafb',
                   color: activeTab === status ? 'white' : '#5c6a6d',
@@ -465,12 +481,17 @@ export default function TasksPage() {
         </div>
       </div>
 
-      {/* Task List */}
-      <div className="flex-1 p-4 pb-24">
-        <div className="max-w-3xl mx-auto space-y-3">
-          <AnimatePresence mode="popLayout">
-            {filteredTasks.length > 0 ? (
-              filteredTasks.map((task) => (
+      {/* Task List - scrollable, fills remaining space */}
+      <div className="flex-1 overflow-y-auto px-3 py-2 pb-20">
+        <div className="max-w-3xl mx-auto">
+          {filteredTasks.length > 0 ? (
+            <Reorder.Group
+              axis="y"
+              values={filteredTasks}
+              onReorder={handleReorder}
+              className="space-y-2"
+            >
+              {filteredTasks.map((task) => (
                 <TaskCard
                   key={task.id}
                   task={task}
@@ -480,24 +501,24 @@ export default function TasksPage() {
                   }
                   onStatusChange={handleStatusChange}
                 />
-              ))
-            ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center py-16"
-              >
-                <div className="text-4xl mb-3">
-                  {activeTab === 'done' ? '🎉' : '🐛'}
-                </div>
-                <p className="text-gray-500">
-                  {activeTab === 'todo' && 'No tasks to do — nice!'}
-                  {activeTab === 'doing' && "Nothing in progress"}
-                  {activeTab === 'done' && 'No completed tasks yet'}
-                </p>
-              </motion.div>
-            )}
-          </AnimatePresence>
+              ))}
+            </Reorder.Group>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-center py-12"
+            >
+              <div className="text-3xl mb-2">
+                {activeTab === 'done' ? '🎉' : '🐛'}
+              </div>
+              <p className="text-gray-500 text-sm">
+                {activeTab === 'todo' && 'No tasks to do — nice!'}
+                {activeTab === 'doing' && "Nothing in progress"}
+                {activeTab === 'done' && 'No completed tasks yet'}
+              </p>
+            </motion.div>
+          )}
         </div>
       </div>
 
