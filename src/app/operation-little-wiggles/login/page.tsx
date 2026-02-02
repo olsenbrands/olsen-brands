@@ -27,7 +27,9 @@ function LoginForm() {
       });
 
       if (res.ok) {
-        router.push(redirect);
+        // Hard redirect so the middleware sees the new cookie
+        window.location.href = redirect;
+        return;
       } else {
         setError('Wrong password');
         setPassword('');
