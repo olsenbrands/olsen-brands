@@ -84,6 +84,19 @@ const missions = {
   ],
   inProgress: [
     {
+      id: 'mi-4',
+      title: 'Clinton Comeback Pre-Launch Testing',
+      description: 'Final testing before Feb 8 launch: real receipts, emails, business claims, mobile devices, Feb 8 cutover',
+      assignee: 'steve',
+      priority: 'high',
+      category: 'tech',
+      dueDate: '2026-02-07',
+      estimatedHours: 8,
+      progress: 0,
+      tags: ['testing', 'clinton-comeback', 'launch'],
+      startedDate: '2026-02-02'
+    },
+    {
       id: 'mi-1',
       title: 'Jimmy Partnership Due Diligence',
       description: 'Complete financial and operational analysis for partnership decision',
