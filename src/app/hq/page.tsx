@@ -18,6 +18,7 @@ import {
   Loader2,
   Zap
 } from 'lucide-react';
+import CronsPanel from './components/CronsPanel';
 
 // Types
 interface Venture {
@@ -517,6 +518,12 @@ export default function HQPage() {
             </div>
           </section>
         </div>
+
+        {/* Scheduled Jobs */}
+        <section>
+          <h2 className="text-xl font-bold mb-4">Scheduled Jobs</h2>
+          <CronsPanel />
+        </section>
 
         {/* Quick Actions */}
         <section>
