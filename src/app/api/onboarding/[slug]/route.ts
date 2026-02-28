@@ -35,6 +35,7 @@ export async function GET(
         requires_signature,
         requires_file_upload,
         requires_form_fill,
+        requires_acknowledgment,
         current_version,
         content,
         content_url,

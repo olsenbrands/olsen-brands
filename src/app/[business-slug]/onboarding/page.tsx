@@ -25,6 +25,7 @@ type DocumentType = {
   requires_signature: boolean;
   requires_file_upload: boolean;
   requires_form_fill: boolean;
+  requires_acknowledgment: boolean;
   current_version: string;
   content: string | null;
   content_url: string | null;
@@ -86,6 +87,9 @@ export default function OnboardingPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [completedDocs, setCompletedDocs] = useState<CompletedDoc[]>([]);
 
+  // Acknowledgment (informational steps with requires_acknowledgment = true)
+  const [acknowledgmentChoice, setAcknowledgmentChoice] = useState<'done' | 'not-received' | null>(null);
+
   // Survey
   const [surveyRating, setSurveyRating] = useState<number | null>(null);
   const [surveyWasClear, setSurveyWasClear] = useState<boolean | null>(null);
@@ -98,6 +102,7 @@ export default function OnboardingPage() {
     setSelectedFile(null);
     setFilePreviewUrl(null);
     setSubmitError(null);
+    setAcknowledgmentChoice(null);
   }, []);
 
   useEffect(() => {
@@ -690,13 +695,106 @@ export default function OnboardingPage() {
                     {activeDoc.content}
                   </div>
                 )}
-                <button
-                  type="button"
-                  onClick={handleInformationalAdvance}
-                  className="w-full py-3 rounded font-medium text-sm transition-opacity hover:opacity-90"
-                  style={{ background: 'var(--accent)', color: '#ffffff' }}>
-                  Got it →
-                </button>
+
+                {/* Acknowledgment radio buttons — shown when requires_acknowledgment = true */}
+                {activeDoc.requires_acknowledgment ? (
+                  <div className="flex flex-col gap-3">
+                    {/* Option 1: Done */}
+                    <label
+                      className="flex items-start gap-3 rounded-lg p-4 cursor-pointer transition-all"
+                      style={{
+                        background: acknowledgmentChoice === 'done' ? 'rgba(201,83,60,0.08)' : 'var(--bg-secondary)',
+                        border: `1px solid ${acknowledgmentChoice === 'done' ? 'var(--accent)' : 'var(--border)'}`,
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="acknowledgment"
+                        value="done"
+                        checked={acknowledgmentChoice === 'done'}
+                        onChange={() => setAcknowledgmentChoice('done')}
+                        className="mt-0.5 flex-shrink-0 accent-[#c9533c]"
+                      />
+                      <div>
+                        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          ✅ Yes, I&apos;ve already set up my Toast banking information.
+                        </p>
+                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                          My bank account and routing number are entered and saved in Toast.
+                        </p>
+                      </div>
+                    </label>
+
+                    {/* Option 2: Not received */}
+                    <label
+                      className="flex items-start gap-3 rounded-lg p-4 cursor-pointer transition-all"
+                      style={{
+                        background: acknowledgmentChoice === 'not-received' ? 'rgba(201,83,60,0.08)' : 'var(--bg-secondary)',
+                        border: `1px solid ${acknowledgmentChoice === 'not-received' ? 'var(--accent)' : 'var(--border)'}`,
+                      }}
+                    >
+                      <input
+                        type="radio"
+                        name="acknowledgment"
+                        value="not-received"
+                        checked={acknowledgmentChoice === 'not-received'}
+                        onChange={() => setAcknowledgmentChoice('not-received')}
+                        className="mt-0.5 flex-shrink-0 accent-[#c9533c]"
+                      />
+                      <div>
+                        <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                          📧 I have not received the Toast setup email yet.
+                        </p>
+                        <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                          I&apos;ll need to reach out to get this sorted before my first shift.
+                        </p>
+                      </div>
+                    </label>
+
+                    {/* "Not received" help callout */}
+                    {acknowledgmentChoice === 'not-received' && (
+                      <div
+                        className="rounded-lg p-4 flex items-start gap-3"
+                        style={{ background: 'rgba(255,193,7,0.08)', border: '1px solid rgba(255,193,7,0.35)' }}
+                      >
+                        <span className="text-lg flex-shrink-0 mt-0.5">⚠️</span>
+                        <div>
+                          <p className="text-sm font-semibold" style={{ color: '#ffc107' }}>
+                            Don&apos;t wait on this — it affects your paycheck.
+                          </p>
+                          <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+                            Text Jordan right now at{' '}
+                            <a
+                              href="sms:8014581589"
+                              className="font-bold underline"
+                              style={{ color: '#ffc107' }}
+                            >
+                              801-458-1589
+                            </a>{' '}
+                            and let him know you haven&apos;t received the Toast email. He&apos;ll get it resent right away.
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
+                    <button
+                      type="button"
+                      disabled={!acknowledgmentChoice}
+                      onClick={handleInformationalAdvance}
+                      className="w-full py-3 rounded font-medium text-sm transition-opacity disabled:opacity-30"
+                      style={{ background: 'var(--accent)', color: '#ffffff' }}>
+                      Continue →
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={handleInformationalAdvance}
+                    className="w-full py-3 rounded font-medium text-sm transition-opacity hover:opacity-90"
+                    style={{ background: 'var(--accent)', color: '#ffffff' }}>
+                    Got it →
+                  </button>
+                )}
               </>
             )}
 
