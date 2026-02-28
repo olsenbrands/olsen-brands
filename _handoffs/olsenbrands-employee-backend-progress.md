@@ -1,6 +1,6 @@
 # OlsenBrands Employee Backend — Build Progress
-**Last Updated:** 2026-02-24  
-**Status:** 🟢 Phase 1 Complete — Ready for Phase 2
+**Last Updated:** 2026-02-28  
+**Status:** 🟢 Phase 2 Built — Ready for Device Testing
 
 ---
 
@@ -34,21 +34,21 @@
 ## Phase 2 — Wedgie's Onboarding Page (Proof of Concept)
 > Goal: An employee can visit /wedgies/onboarding, sign the policy, and their record is saved.
 
-- [ ] Create `/[business-slug]/onboarding` dynamic route
-- [ ] Build employee identification step (name + email form)
-- [ ] Build onboarding checklist UI (shows required docs for that business)
-- [ ] Build policy viewer component (scrollable full text)
-- [ ] Integrate `react-signature-canvas` signature pad
-- [ ] PDF generation on submission (`@react-pdf/renderer`)
-- [ ] Upload signature PNG to Supabase Storage
-- [ ] Upload generated PDF to Supabase Storage
-- [ ] Save `employee_documents` record to Supabase
-- [ ] Save/upsert `employees` record
-- [ ] Save/upsert `employee_businesses` record
-- [ ] Build success/confirmation screen with PDF download link
-- [ ] Send confirmation email to employee on completion
-- [ ] Mobile-first responsive design
-- [ ] Test on actual phone
+- [x] Create `/[business-slug]/onboarding` dynamic route ✅
+- [x] Build employee identification step (name + email form) ✅
+- [x] Build onboarding checklist UI (shows required docs for that business) ✅
+- [x] Build policy viewer component (scrollable full text) ✅
+- [x] Integrate `react-signature-canvas` signature pad ✅
+- [x] PDF generation on submission (`@react-pdf/renderer`) ✅
+- [x] Upload signature PNG to Supabase Storage ✅
+- [x] Upload generated PDF to Supabase Storage ✅
+- [x] Save `employee_documents` record to Supabase ✅
+- [x] Save/upsert `employees` record ✅
+- [x] Save/upsert `employee_businesses` record ✅
+- [x] Build success/confirmation screen with PDF download link ✅
+- [ ] Send confirmation email to employee on completion (Phase 4 — Brevo)
+- [x] Mobile-first responsive design ✅
+- [ ] Test on actual phone ← NEXT
 
 ---
 
@@ -117,3 +117,4 @@
 | 2026-02-24 | Email service | Brevo (Jordan already has account) |
 | 2026-02-24 | Admin users | Jordan (jordan@olsenbrands.com) + Jennifer (jennifer@olsenbrands.com) |
 | 2026-02-24 | Phase 1 complete | 6 tables created, storage bucket live, 7 businesses seeded, policy v1.0 loaded |
+| 2026-02-28 | Phase 2 complete | Onboarding page built: identity → sign → confirm. Signature PNG + PDF saved to Supabase Storage. Merged to main. |
