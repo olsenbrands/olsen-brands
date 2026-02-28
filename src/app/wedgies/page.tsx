@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { MapPin, Clock, ExternalLink, Users } from 'lucide-react';
 import { Navbar } from '@/components/Navbar';
 import { Footer } from '@/components/Footer';
@@ -7,66 +8,169 @@ import { Footer } from '@/components/Footer';
 
 const signatureWedgies = [
   {
-    name: 'Blue Bacon Wedgie',
+    name: 'Chicken Bacon Avocado Wedgie',
+    tagline: 'Our most popular salad.',
     description:
-      'Iceberg Wedge, Fresh Cut Greens, Blue Cheese Dressing, Bacon, Blue Cheese Crumbles, Tomato, Red Onion, Dried Cranberries, Chives, Salt & Pepper',
-  },
-  {
-    name: 'Green Goddess Wedgie',
-    description:
-      'Romaine Wedge, Bed of Spinach, Homemade Green Goddess Dressing, Bacon, Avocado, Hardboiled Egg, Parmesan Cheese, Cherry Tomato, Red Onion, Cucumber, Broccoli, Chives, Croutons, Salt & Pepper, Oregano',
-  },
-  {
-    name: 'Down Home Wedgie',
-    description:
-      'Iceberg Wedge, Fresh Cut Greens, Homemade Ranch Dressing, Grilled Chicken, Ham, Cheddar Cheese, Tomato, Cucumber, Peas, Broccoli, Croutons, Chives, Salt & Pepper, Oregano',
+      'Iceberg wedge, fresh cut greens, ranch dressing, crispy chicken, bacon, cheddar cheese, avocado, hardboiled egg, tomato, cucumber, avocado ranch, croutons, chives, salt & pepper, oregano',
+    price: '$12.49',
   },
   {
     name: "Caesar's Big Time Wedgie",
+    tagline: "Fit for an emperor — or a very hungry lunch break.",
     description:
-      'Romaine Wedge, Bed of Spinach, Caesar Dressing, Grilled Chicken, Bacon, Parmesan Cheese, Tomato, Red Onion, Cucumber, Croutons, Salt & Pepper, Oregano',
+      'Romaine wedge, bed of spinach, Caesar dressing, grilled chicken, bacon, Parmesan cheese, tomato, red onion, cucumber, croutons, chives, salt & pepper, oregano',
+    price: '$11.49',
   },
   {
-    name: 'Good Greek Wedgie',
+    name: 'Down Home Wedgie',
+    tagline: 'The salad you grew up loving, built bigger.',
     description:
-      'Romaine Wedge, Bed of Spinach, Greek Dressing, Shaved Lamb, Feta, Tomato, Red Onion, Cucumber, Green Pepper, Greek Olives, Pepperoncini Pepper, Tzatziki Sauce',
+      'Iceberg wedge, fresh cut greens, homemade ranch dressing, grilled chicken, ham, cheddar cheese, tomato, cucumber, peas, broccoli, croutons, chives, salt & pepper, oregano',
+    price: '$11.29',
   },
   {
-    name: 'Chicken Bacon Avocado Wedgie',
+    name: 'The Good Greek Wedgie',
+    tagline: 'A gyro in salad form.',
     description:
-      'Iceberg Wedge, Fresh Cut Greens, Ranch Dressing, Crispy Chicken, Bacon, Cheddar Cheese, Avocado, Hardboiled Egg, Tomato, Cucumber, Avocado Ranch, Crouton, Chives, Salt & Pepper, Oregano',
+      'Romaine wedge, bed of spinach, Greek dressing, shaved lamb, feta, tomato, red onion, cucumber, green pepper, Greek olives, pepperoncini pepper, tzatziki sauce',
+    price: '$10.19',
+  },
+  {
+    name: 'Green Goddess Wedgie',
+    tagline: 'Creamy, crunchy, and loaded with good stuff.',
+    description:
+      'Romaine wedge, bed of spinach, homemade green goddess dressing, bacon, avocado, hardboiled egg, Parmesan cheese, cherry tomato, red onion, cucumber, broccoli, chives, croutons, salt & pepper, oregano',
+    price: '$9.99',
+  },
+  {
+    name: 'Jalapeño Chicken Bacon Wedgie',
+    tagline: 'Three layers of jalapeño heat.',
+    description:
+      'Iceberg wedge, fresh cut greens, ranch dressing, crispy chicken, bacon, hardboiled egg, cheddar cheese, tomato, cucumber, jalapeño ranch dressing, fresh diced jalapeños, crispy fried jalapeños, chives, salt & pepper, oregano',
+    price: '$12.99',
+  },
+  {
+    name: 'The Big Dill Wedgie',
+    tagline: 'This one\'s kind of a big dill.',
+    description:
+      'Iceberg wedge, fresh cut greens, homemade ranch dressing, grilled chicken, ham, cheddar, cherry tomato, cucumbers, peas, broccoli, dill aioli dressing, large pickle spear, croutons, chives, salt & pepper, oregano',
+    price: '$13.29',
+  },
+  {
+    name: 'Blue Bacon Wedgie',
+    tagline: 'The quintessential steakhouse wedge.',
+    description:
+      'Iceberg wedge, fresh cut greens, blue cheese dressing, bacon, blue cheese crumbles, tomato, red onion, dried cranberries, chives, salt & pepper',
+    price: '$8.29',
   },
 ];
 
 const tossedSalads = [
   {
-    name: 'Balsamic Berry',
-    description:
-      'Fresh Cut Greens, Homemade Balsamic Vinaigrette, Feta, Strawberries, Blueberries, Raspberries, Dried Cranberries, Toasted Almonds',
-  },
-  {
-    name: 'Mango Berry',
-    description:
-      'Fresh Cut Greens, Poppy Seed Dressing, Mangos, Strawberries, Blueberries, Raspberries, Dried Cranberries, Toasted Almonds',
-  },
-  {
     name: 'Santa Fe Salad w/ Burnt Ends',
+    tagline: 'Protein-packed powerhouse.',
     description:
-      'Fresh Cut Greens, Tomatillo Lime Dressing, Burnt Ends, Cortina Cheese, Avocado, Black Beans, Corn, Tomato, Red Onions, Cilantro, Tortilla Strips, Lime Wedge, Crispy Jalapeños',
+      'Fresh cut greens, tomatillo lime dressing, burnt ends, cortina cheese, avocado, black beans, corn, tomato, red onions, cilantro, tortilla strips, lime wedge, crispy jalapeños',
+    price: '$15.49',
   },
   {
     name: "Elaine's Big Salad",
+    tagline: 'Named after our favorite Seinfeld plot.',
     description:
-      'Fresh Cut Greens, Choice of Dressing, Grilled Chicken, Ham, Bacon, Avocado, Hardboiled Egg, Cheddar Cheese, Red Onion, Tomato, Broccoli, Cucumber, Peas, Croutons, Chives, Salt & Pepper, Oregano',
+      'Fresh cut greens, choice of dressing, grilled chicken, ham, bacon, avocado, hardboiled egg, cheddar cheese, red onion, tomato, broccoli, cucumber, peas, croutons, chives, salt & pepper, oregano',
+    price: '$13.99',
+  },
+  {
+    name: 'Bright Crab Salad',
+    tagline: 'A light, zesty take on Maryland crab salad.',
+    description:
+      'Fresh cut greens, crab salad, red wine vinegar & olive oil dressing, tomatoes, cucumbers, red onions, pepperoncini pepper, kalamata olives, lemon wedge',
+    price: '$10.49',
+  },
+  {
+    name: 'Santa Fe Salad w/ Grilled Chicken',
+    tagline: 'Bold, fresh, and packed with protein.',
+    description:
+      'Fresh cut greens, tomatillo lime dressing, grilled chicken, cortina cheese, avocado, black beans, corn, tomato, red onions, cilantro, tortilla strips, lime wedge, crispy jalapeños',
+    price: '$11.49',
+  },
+  {
+    name: 'Mango Berry Salad',
+    tagline: 'Sweet, juicy, and totally refreshing.',
+    description:
+      'Fresh cut greens, poppy seed dressing, mangoes, strawberries, blueberries, raspberries, dried cranberries, toasted almonds',
+    price: '$9.29',
+  },
+  {
+    name: 'Balsamic Berry Salad',
+    tagline: 'Fruity, tangy, and worth every bite.',
+    description:
+      'Fresh cut greens, homemade balsamic vinaigrette, feta, strawberries, blueberries, raspberries, dried cranberries, sliced almonds',
+    price: '$7.99',
   },
   {
     name: 'Garden Salad w/ Ranch',
+    tagline: 'A classic done right.',
     description:
-      'Fresh Cut Greens, Ranch Dressing, Cheddar Cheese, Tomato, Cucumber, Red Onion, Croutons, Salt & Pepper, Oregano',
+      'Fresh cut greens, ranch dressing, cheddar cheese, tomato, cucumber, red onion, croutons, salt & pepper, oregano',
+    price: '$6.49',
   },
   {
     name: 'Classic Caesar Salad',
-    description: 'Romaine Lettuce, Caesar Dressing, Croutons, Parmesan Cheese',
+    tagline: 'Simple and satisfying.',
+    description: 'Romaine lettuce, Caesar dressing, croutons, Parmesan cheese',
+    price: '$5.99',
+  },
+];
+
+const wedgitos = [
+  {
+    name: 'Chicken Bacon Avocado Wedgito',
+    tagline: 'The fan favorite, in burrito form.',
+    description:
+      'Fresh cut greens, flour tortilla, ranch dressing, crispy chicken, bacon, cheddar cheese, avocado, hardboiled egg, tomato, cucumber, avocado ranch, croutons, chives, salt & pepper, oregano',
+    price: '$12.49',
+    image: '/wedgies/wedgito-cba.png',
+  },
+  {
+    name: 'The Good Greek Wedgito',
+    tagline: 'Like a gyro in burrito form.',
+    description:
+      'Fresh cut greens, flour tortilla, Greek dressing, shaved lamb, feta, tomato, red onion, cucumber, green pepper, Greek olives, pepperoncini pepper, tzatziki sauce',
+    price: '$9.99',
+    image: '/wedgies/wedgito-greek.jpg',
+  },
+  {
+    name: 'Santa Fe Wedgito w/ Burnt Ends',
+    tagline: 'Smoky, stacked, and seriously good.',
+    description:
+      'Fresh cut greens, flour tortilla, tomatillo lime dressing, beef burnt ends, cortina cheese, avocado, black beans, corn, tomato, red onions, cilantro, tortilla strips, lime wedge, crispy jalapeños',
+    price: '$15.49',
+    image: '/wedgies/wedgito-santa-fe.jpg',
+  },
+  {
+    name: 'Jalapeño Chicken Bacon Wedgito',
+    tagline: 'Crispy chicken, bacon, and double jalapeños.',
+    description:
+      'Fresh cut greens, flour tortilla, homemade ranch dressing, crispy chicken, bacon, hardboiled egg, cheddar cheese, cherry tomato, cucumber, jalapeño ranch dressing, fresh diced jalapeños, crispy fried jalapeños, chives, salt & pepper, oregano',
+    price: '$12.99',
+    image: null,
+  },
+  {
+    name: "Elaine's Big Wedgito",
+    tagline: 'Fully loaded. Oversized. Named after Seinfeld.',
+    description:
+      'Fresh cut greens, flour tortilla, choice of dressing, grilled chicken, ham, bacon, avocado, hardboiled egg, cheddar cheese, red onion, tomato, broccoli, cucumber, peas, croutons, chives, salt & pepper, oregano',
+    price: '$13.99',
+    image: null,
+  },
+  {
+    name: 'Down Home Wedgito',
+    tagline: 'Comfort food in handheld form.',
+    description:
+      'Fresh cut greens, flour tortilla, homemade ranch dressing, grilled chicken, ham, cheddar cheese, tomato, cucumber, peas, broccoli, croutons, chives, salt & pepper, oregano',
+    price: '$11.29',
+    image: null,
   },
 ];
 
@@ -74,15 +178,18 @@ const eggys = [
   {
     name: 'Ham & Cheese Eggy',
     description: 'Fresh waffled Eggys, ham, pepper jack cheese, mayo, salt & pepper',
+    price: null,
   },
   {
     name: 'Bacon, Ham & Cheese Eggy',
     description: 'Fresh waffled Eggys, ham, bacon, pepper jack cheese, mayo, salt & pepper',
+    price: null,
   },
   {
     name: 'Atomic Eggy',
     description:
       'Fresh waffled Eggys, ham, bacon, pepper jack cheese, green pepper, red onion, fresh jalapeño, spinach, homemade sriracha mayo',
+    price: null,
   },
 ];
 
@@ -90,37 +197,40 @@ const wacos = [
   {
     name: 'Waco — Ham & Cheese',
     description: 'Flour tortilla, fresh eggs, ham, cheddar cheese, mayo, chives, salt & pepper',
+    price: null,
   },
   {
     name: 'Waco — Bacon, Ham & Cheese',
     description:
       'Flour tortilla, fresh eggs, ham, bacon, cheddar cheese, mayo, chives, salt & pepper',
+    price: null,
   },
   {
     name: 'Atomic Waco',
     description:
       'Fresh egg, bacon, ham, pepper jack cheese, green onion, fresh jalapeño, green peppers, mayo, sriracha mayo — wrapped in a soft flour tortilla',
+    price: null,
   },
 ];
 
 const parfaits = [
   {
     name: 'Chia Seed Parfait — Strawberry & Blueberry',
-    description: '12 oz cup with chia seed pudding, fresh strawberries, blueberries, and granola',
+    description: '12 oz with chia seed pudding, fresh strawberries, blueberries, and granola',
   },
   {
     name: 'Chia Seed Parfait — Raspberry & Mango',
-    description: '12 oz cup with chia seed pudding, fresh raspberries, mango, and granola',
+    description: '12 oz with chia seed pudding, fresh raspberries, mango, and granola',
   },
   {
     name: 'Greek Yogurt Parfait — Strawberry & Blueberry',
     description:
-      '12 oz parfait with vanilla, strawberry, and plain greek yogurt, fresh strawberries, blueberries, and granola',
+      '12 oz with vanilla, strawberry, and plain greek yogurt, fresh strawberries, blueberries, and granola',
   },
   {
     name: 'Greek Yogurt Parfait — Raspberry & Mango',
     description:
-      '12 oz parfait with vanilla and strawberry greek yogurt, fresh raspberries, mango, and granola',
+      '12 oz with vanilla and strawberry greek yogurt, fresh raspberries, mango, and granola',
   },
   {
     name: 'Breakfast Banana Split',
@@ -131,31 +241,39 @@ const parfaits = [
 
 // ─── Sub-components ────────────────────────────────────
 
-function MenuSection({
-  title,
-  items,
-  note,
+function MenuItem({
+  name,
+  tagline,
+  description,
+  price,
 }: {
-  title: string;
-  items: { name: string; description: string }[];
-  note?: string;
+  name: string;
+  tagline?: string;
+  description: string;
+  price?: string | null;
 }) {
   return (
-    <div className="mb-16">
-      <h3 className="text-xl font-bold text-[#efe5cd] mb-1">{title}</h3>
-      {note && <p className="text-sm text-[#efe5cd]/40 mb-6">{note}</p>}
-      {!note && <div className="h-px bg-[#efe5cd]/10 mb-6 mt-2" />}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {items.map((item) => (
-          <div
-            key={item.name}
-            className="p-5 bg-white/[0.03] border border-white/10 rounded-xl hover:border-[#c9533c]/30 transition-colors"
-          >
-            <p className="font-semibold text-[#efe5cd] mb-1">{item.name}</p>
-            <p className="text-sm text-[#efe5cd]/50 leading-relaxed">{item.description}</p>
-          </div>
-        ))}
+    <div className="p-5 bg-white/[0.03] border border-white/10 rounded-xl hover:border-[#c9533c]/30 transition-colors">
+      <div className="flex items-start justify-between gap-3 mb-1">
+        <p className="font-semibold text-[#efe5cd]">{name}</p>
+        {price && (
+          <span className="text-sm font-medium text-[#c9533c] flex-shrink-0">{price}</span>
+        )}
       </div>
+      {tagline && <p className="text-xs text-[#c9533c]/70 italic mb-1.5">{tagline}</p>}
+      <p className="text-sm text-[#efe5cd]/50 leading-relaxed">{description}</p>
+    </div>
+  );
+}
+
+function SectionHeader({ title, description }: { title: string; description?: string }) {
+  return (
+    <div className="mb-8">
+      <h3 className="text-2xl font-black text-[#efe5cd]">{title}</h3>
+      {description && (
+        <p className="text-sm text-[#efe5cd]/50 mt-2 max-w-2xl leading-relaxed">{description}</p>
+      )}
+      <div className="h-px bg-[#c9533c]/20 mt-4" />
     </div>
   );
 }
@@ -169,120 +287,114 @@ export default function WedgiesPage() {
 
       <main className="pt-20">
         {/* Hero */}
-        <section className="relative py-24 px-6 overflow-hidden">
-          {/* subtle background texture */}
-          <div className="absolute inset-0 bg-gradient-to-b from-[#c9533c]/5 to-transparent pointer-events-none" />
-          <div className="max-w-4xl mx-auto relative">
-            <div className="flex items-center gap-2 text-sm text-[#efe5cd]/40 mb-8">
-              <Link href="/" className="hover:text-[#efe5cd]/70 transition-colors">
-                Olsen Brands
-              </Link>
-              <span>/</span>
-              <span className="text-[#efe5cd]/70">Wedgies</span>
-            </div>
-
-            <div className="flex items-center gap-3 mb-6">
-              <img
-                src="/logos/wedgies.jpg"
-                alt="Wedgies"
-                className="w-16 h-16 rounded-xl object-cover"
-              />
-              <div>
-                <h1 className="text-5xl md:text-6xl font-black text-[#efe5cd] leading-none">
-                  Wedgies
-                </h1>
-                <p className="text-[#c9533c] font-semibold mt-1 tracking-wide text-sm uppercase">
-                  Greens, Proteins &amp; Ice Cream
+        <section className="relative overflow-hidden">
+          {/* Hero image */}
+          <div className="relative h-[420px] md:h-[520px] w-full">
+            <Image
+              src="/wedgies/wedgie-cba-hero.png"
+              alt="Chicken Bacon Avocado Wedgie"
+              fill
+              className="object-cover object-center"
+              priority
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#0f0f0f] via-[#0f0f0f]/80 to-transparent" />
+            <div className="absolute inset-0 flex items-center px-6">
+              <div className="max-w-4xl mx-auto w-full">
+                <div className="flex items-center gap-2 text-sm text-[#efe5cd]/40 mb-6">
+                  <Link href="/" className="hover:text-[#efe5cd]/70 transition-colors">
+                    Olsen Brands
+                  </Link>
+                  <span>/</span>
+                  <span className="text-[#efe5cd]/70">Wedgies</span>
+                </div>
+                <div className="flex items-center gap-3 mb-4">
+                  <img
+                    src="/logos/wedgies.jpg"
+                    alt="Wedgies"
+                    className="w-14 h-14 rounded-xl object-cover"
+                  />
+                  <div>
+                    <h1 className="text-5xl md:text-6xl font-black text-[#efe5cd] leading-none">
+                      Wedgies
+                    </h1>
+                    <p className="text-[#c9533c] font-semibold mt-1 text-sm uppercase tracking-wide">
+                      Greens, Proteins &amp; Ice Cream
+                    </p>
+                  </div>
+                </div>
+                <p className="text-[#efe5cd]/70 text-lg max-w-lg leading-relaxed mb-6">
+                  Nobody else does salads like this. Built big, bold, and made fresh to order at our
+                  drive-thru in Clinton, UT.
                 </p>
-              </div>
-            </div>
-
-            <p className="text-[#efe5cd]/70 text-lg max-w-2xl leading-relaxed mb-8">
-              Fresh wedge salads, one-of-a-kind breakfast items, and crazy good ice cream — all made
-              to order at our drive-thru in Clinton, UT. We start with a wedge. Then we pile on.
-            </p>
-
-            <div className="flex flex-wrap items-center gap-4">
-              <a
-                href="https://order.dripos.com/wedgies"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-6 py-3 bg-[#c9533c] text-white font-semibold rounded-lg hover:bg-[#b8432c] transition-colors"
-              >
-                Order Online
-                <ExternalLink size={16} />
-              </a>
-              <div className="flex items-center gap-1.5 text-sm text-[#efe5cd]/50">
-                <MapPin size={14} />
-                <span>Clinton, UT</span>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* Dole Whip Promo Banner */}
-        <section className="px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="rounded-xl border border-[#c9533c]/30 bg-[#c9533c]/10 p-6">
-              <div className="flex items-start gap-4">
-                <span className="text-3xl">🍍</span>
-                <div>
-                  <p className="font-bold text-[#efe5cd] text-lg">Wedgies Now Has Dole Whip!</p>
-                  <p className="text-[#efe5cd]/60 mt-1 text-sm leading-relaxed">
-                    Smooth, pineapple-flavored soft-serve that&apos;s sweet, a little tart, super
-                    fluffy — and dairy-free. You can basically tell yourself it&apos;s fruit.
-                  </p>
+                <div className="flex flex-wrap items-center gap-4">
+                  <a
+                    href="https://order.dripos.com/wedgies"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 px-6 py-3 bg-[#c9533c] text-white font-bold rounded-lg hover:bg-[#b8432c] transition-colors"
+                  >
+                    Order Online
+                    <ExternalLink size={16} />
+                  </a>
+                  <div className="flex items-center gap-3 text-sm text-[#efe5cd]/50">
+                    <span className="flex items-center gap-1.5">
+                      <MapPin size={14} />
+                      Clinton, UT
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock size={14} />
+                      Mon–Sat 10AM–8:30PM
+                    </span>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* About */}
-        <section className="py-16 px-6">
-          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-8">
-            <div className="p-6 bg-white/[0.03] border border-white/10 rounded-xl">
-              <h2 className="font-bold text-[#efe5cd] mb-3">Vibrant &amp; Nutritious</h2>
-              <p className="text-[#efe5cd]/60 text-sm leading-relaxed">
-                Every day our kitchen preps fresh-cut greens, colorful vegetables, and high-quality
-                proteins to build gourmet salads that actually taste like something. From the Mango
-                Berry to the Good Greek Wedgie, we use homemade dressings and real ingredients —
-                nothing out of a bag.
-              </p>
-            </div>
-            <div className="p-6 bg-white/[0.03] border border-white/10 rounded-xl">
-              <h2 className="font-bold text-[#efe5cd] mb-3">Beyond the Salad</h2>
-              <p className="text-[#efe5cd]/60 text-sm leading-relaxed">
-                Our No Carb Eggys are a breakfast item you won&apos;t find anywhere else, and our
-                Wacos (pronounced &ldquo;Wah-Co&rdquo;) are made fresh to order and have built a
-                loyal following fast. Add in our chia seed pudding parfaits, greek yogurt parfaits,
-                and thick shakes — there&apos;s always a reason to come back.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* Hours */}
-        <section className="py-6 px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="flex items-center gap-3 p-5 bg-white/[0.03] border border-white/10 rounded-xl">
-              <Clock size={20} className="text-[#c9533c] flex-shrink-0" />
+        {/* Dole Whip Banner */}
+        <section className="px-6 py-6">
+          <div className="max-w-5xl mx-auto">
+            <div className="rounded-xl border border-[#c9533c]/30 bg-[#c9533c]/10 px-6 py-5 flex items-start gap-4">
+              <span className="text-3xl flex-shrink-0">🍍</span>
               <div>
-                <p className="text-xs text-[#efe5cd]/40 uppercase tracking-wider mb-1">
-                  Winter Hours
+                <p className="font-bold text-[#efe5cd]">Wedgies Now Has Dole Whip!</p>
+                <p className="text-[#efe5cd]/60 text-sm mt-1">
+                  Smooth, pineapple soft-serve that&apos;s dairy-free, vegan, and sweet enough to
+                  convince yourself it counts as fruit. Available in-store.
                 </p>
-                <p className="text-[#efe5cd] font-semibold">
-                  Mon – Sat &nbsp;·&nbsp; 10:00 AM – 8:30 PM
-                </p>
-                <p className="text-[#efe5cd]/50 text-sm">Sunday closed</p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Menu */}
-        <section className="py-16 px-6">
-          <div className="max-w-4xl mx-auto">
+        {/* Featured Photos */}
+        <section className="px-6 py-6">
+          <div className="max-w-5xl mx-auto grid grid-cols-3 gap-3">
+            <div className="relative aspect-square rounded-xl overflow-hidden">
+              <Image src="/wedgies/salad-santa-fe-burnt-ends.png" alt="Santa Fe with Burnt Ends" fill className="object-cover" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                <p className="text-xs font-semibold text-white">Santa Fe w/ Burnt Ends</p>
+              </div>
+            </div>
+            <div className="relative aspect-square rounded-xl overflow-hidden">
+              <Image src="/wedgies/salad-bright-crab.png" alt="Bright Crab Salad" fill className="object-cover" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                <p className="text-xs font-semibold text-white">Bright Crab Salad</p>
+              </div>
+            </div>
+            <div className="relative aspect-square rounded-xl overflow-hidden">
+              <Image src="/wedgies/salad-elaines.png" alt="Elaine's Big Salad" fill className="object-cover" />
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                <p className="text-xs font-semibold text-white">Elaine&apos;s Big Salad</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Full Menu */}
+        <section className="py-12 px-6">
+          <div className="max-w-5xl mx-auto">
             <div className="flex items-center justify-between mb-12">
               <h2 className="text-3xl font-black text-[#efe5cd]">The Menu</h2>
               <a
@@ -291,73 +403,163 @@ export default function WedgiesPage() {
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 text-sm bg-[#c9533c] text-white font-semibold rounded-lg hover:bg-[#b8432c] transition-colors"
               >
-                Order Online
-                <ExternalLink size={14} />
+                Order Online <ExternalLink size={14} />
               </a>
             </div>
 
-            <MenuSection title="Signature Wedgies" items={signatureWedgies} />
-            <MenuSection title="Tossed Salads" items={tossedSalads} />
-
-            {/* Proteins & Breakfast */}
+            {/* Signature Wedgies */}
             <div className="mb-16">
-              <h3 className="text-xl font-bold text-[#efe5cd] mb-1">Proteins &amp; Breakfast</h3>
-              <p className="text-sm text-[#efe5cd]/40 mb-6">Served all day (until 8:30 PM)</p>
+              <SectionHeader
+                title="Signature Wedgies"
+                description="One-of-a-kind wedge salads — built big, bold, and unlike anything you'll find at typical salad spots. Each one starts with a crisp wedge and finishes with rich, homemade dressings."
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                {signatureWedgies.map((item) => (
+                  <MenuItem key={item.name} {...item} />
+                ))}
+              </div>
+              <div className="relative rounded-xl overflow-hidden h-64">
+                <Image
+                  src="/wedgies/wedgie-cba.png"
+                  alt="Chicken Bacon Avocado Wedgie"
+                  fill
+                  className="object-cover object-top"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/70 to-transparent flex items-end p-6">
+                  <div>
+                    <p className="text-white font-bold text-lg">Chicken Bacon Avocado Wedgie</p>
+                    <p className="text-white/60 text-sm">Our most popular. And for good reason.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
 
+            {/* Tossed Salads */}
+            <div className="mb-16">
+              <SectionHeader
+                title="Tossed Salads"
+                description="Big, bold, and full of flavor — never boring. From sweet berry salads to crab, burnt ends, and shaved lamb. Made fresh to order, always worth writing home about."
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {tossedSalads.map((item) => (
+                  <MenuItem key={item.name} {...item} />
+                ))}
+              </div>
+            </div>
+
+            {/* Wedgito Burritos */}
+            <div className="mb-16">
+              <SectionHeader
+                title="Wedgito Burritos"
+                description='Pronounced "wedg-ee-toh." Any of our fresh salads turned into a handheld, flavor-packed burrito. Full of protein, made to eat on the go — and never any cheap fillers like rice, potatoes, or refried beans.'
+              />
+              {/* Burrito photos */}
+              <div className="grid grid-cols-3 gap-3 mb-8">
+                <div className="relative aspect-[3/4] rounded-xl overflow-hidden">
+                  <Image src="/wedgies/wedgito-cba.png" alt="CBA Wedgito" fill className="object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                    <p className="text-xs font-semibold text-white">CBA Wedgito</p>
+                  </div>
+                </div>
+                <div className="relative aspect-[3/4] rounded-xl overflow-hidden">
+                  <Image src="/wedgies/wedgito-greek.jpg" alt="Good Greek Wedgito" fill className="object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                    <p className="text-xs font-semibold text-white">Good Greek Wedgito</p>
+                  </div>
+                </div>
+                <div className="relative aspect-[3/4] rounded-xl overflow-hidden">
+                  <Image src="/wedgies/wedgito-santa-fe.jpg" alt="Santa Fe Wedgito" fill className="object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                    <p className="text-xs font-semibold text-white">Santa Fe Wedgito</p>
+                  </div>
+                </div>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {wedgitos.map((item) => (
+                  <MenuItem key={item.name} name={item.name} tagline={item.tagline} description={item.description} price={item.price} />
+                ))}
+              </div>
+              <p className="text-xs text-[#efe5cd]/30 mt-4 italic">
+                Every salad on the menu is also available as a Wedgito — ask at the window.
+              </p>
+            </div>
+
+            {/* Wacos & Eggys */}
+            <div className="mb-16">
+              <SectionHeader
+                title="Wacos &amp; Eggys"
+                description="All-day breakfast favorites. The Eggy is a no-carb sandwich made with a fresh waffled egg instead of bread. The Waco (pronounced 'Wah-Co') is folded into a flour tortilla and made fresh to order."
+              />
               <h4 className="text-sm font-semibold text-[#c9533c] uppercase tracking-wider mb-4">
-                Eggys — No Carb, All Flavor
+                No Carb Eggys
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
                 {eggys.map((item) => (
-                  <div
-                    key={item.name}
-                    className="p-5 bg-white/[0.03] border border-white/10 rounded-xl hover:border-[#c9533c]/30 transition-colors"
-                  >
-                    <p className="font-semibold text-[#efe5cd] mb-1">{item.name}</p>
-                    <p className="text-sm text-[#efe5cd]/50 leading-relaxed">{item.description}</p>
-                  </div>
+                  <MenuItem key={item.name} name={item.name} description={item.description} />
                 ))}
               </div>
-
               <h4 className="text-sm font-semibold text-[#c9533c] uppercase tracking-wider mb-4">
                 Wacos — Pronounced &ldquo;Wah-Co&rdquo;
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {wacos.map((item) => (
-                  <div
-                    key={item.name}
-                    className="p-5 bg-white/[0.03] border border-white/10 rounded-xl hover:border-[#c9533c]/30 transition-colors"
-                  >
-                    <p className="font-semibold text-[#efe5cd] mb-1">{item.name}</p>
-                    <p className="text-sm text-[#efe5cd]/50 leading-relaxed">{item.description}</p>
-                  </div>
+                  <MenuItem key={item.name} name={item.name} description={item.description} />
                 ))}
               </div>
             </div>
 
-            <MenuSection title="Fresh Parfaits" items={parfaits} />
-
-            {/* Ice Cream */}
+            {/* Parfaits */}
             <div className="mb-16">
-              <h3 className="text-xl font-bold text-[#efe5cd] mb-2">Crazy Good Ice Cream</h3>
-              <div className="h-px bg-[#efe5cd]/10 mb-6" />
-              <p className="text-[#efe5cd]/60 text-sm leading-relaxed mb-6">
-                A wide selection of flavored cones and thick shakes with dozens of flavors to choose
-                from — classic vanilla to indulgent Orange Dreamsicle, and everything in between.
-                Plus Dole Whip, now available!
-              </p>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-xl">
+              <SectionHeader
+                title="Fresh Parfaits"
+                description="Protein-packed chia seed pudding and greek yogurt parfaits — a nutritious option to kickstart your day or refuel after a workout."
+              />
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {parfaits.map((item) => (
+                  <MenuItem key={item.name} name={item.name} description={item.description} />
+                ))}
+              </div>
+            </div>
+
+            {/* Ice Cream & Shakes */}
+            <div className="mb-16">
+              <SectionHeader
+                title="Crazy Good Ice Cream"
+                description="Soft-serve from Farr Better Ice Cream, flavored cones, and thick shakes with dozens of flavors. Plus Dole Whip — dairy-free, vegan, and dangerously good."
+              />
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-6">
+                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-xl hover:border-[#c9533c]/30 transition-colors">
                   <p className="font-semibold text-[#efe5cd] mb-1">Flavored Cones</p>
                   <p className="text-sm text-[#efe5cd]/50">
-                    Must be purchased in person — not available online.
+                    Dozens of flavors, from classic vanilla to Orange Dreamsicle. In-store only.
                   </p>
                 </div>
-                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-xl">
+                <div className="p-5 bg-white/[0.03] border border-white/10 rounded-xl hover:border-[#c9533c]/30 transition-colors">
                   <p className="font-semibold text-[#efe5cd] mb-1">Thick Shakes</p>
                   <p className="text-sm text-[#efe5cd]/50">
-                    Must be purchased in person — not available online.
+                    Loaded, blended, and made to order. In-store only.
                   </p>
+                </div>
+                <div className="p-5 bg-white/[0.03] border border-[#c9533c]/30 bg-[#c9533c]/5 rounded-xl">
+                  <p className="font-semibold text-[#efe5cd] mb-1">🍍 Dole Whip</p>
+                  <p className="text-sm text-[#efe5cd]/50">
+                    Pineapple soft-serve. Dairy-free, vegan, and basically just fruit. In-store only.
+                  </p>
+                </div>
+              </div>
+              {/* Shake photos */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="relative aspect-square rounded-xl overflow-hidden">
+                  <Image src="/wedgies/shake-banana.png" alt="Banana Thick Shake" fill className="object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                    <p className="text-xs font-semibold text-white">Banana Thick Shake</p>
+                  </div>
+                </div>
+                <div className="relative aspect-square rounded-xl overflow-hidden">
+                  <Image src="/wedgies/shake-reeses.png" alt="Reese's Thick Shake" fill className="object-cover" />
+                  <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-3">
+                    <p className="text-xs font-semibold text-white">Reese&apos;s Thick Shake</p>
+                  </div>
                 </div>
               </div>
             </div>
@@ -365,24 +567,50 @@ export default function WedgiesPage() {
         </section>
 
         {/* Order CTA */}
-        <section className="py-12 px-6">
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-[#efe5cd]/50 text-sm mb-4">Ready to build your Wedgie?</p>
+        <section className="py-12 px-6 bg-[#c9533c]/5 border-y border-[#c9533c]/20">
+          <div className="max-w-5xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-6">
+            <div>
+              <p className="text-2xl font-black text-[#efe5cd]">Ready to build your Wedgie?</p>
+              <p className="text-[#efe5cd]/50 text-sm mt-1">
+                Order ahead for pickup — or just pull through the drive-thru.
+              </p>
+            </div>
             <a
               href="https://order.dripos.com/wedgies"
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 px-8 py-4 bg-[#c9533c] text-white font-bold text-lg rounded-xl hover:bg-[#b8432c] transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 bg-[#c9533c] text-white font-bold text-lg rounded-xl hover:bg-[#b8432c] transition-colors flex-shrink-0"
             >
-              Order Online Now
-              <ExternalLink size={18} />
+              Order Online <ExternalLink size={18} />
             </a>
           </div>
         </section>
 
-        {/* Employee Resource */}
-        <section className="py-12 px-6 border-t border-white/[0.06]">
-          <div className="max-w-4xl mx-auto">
+        {/* Hours + Address */}
+        <section className="py-10 px-6">
+          <div className="max-w-5xl mx-auto grid sm:grid-cols-2 gap-4">
+            <div className="flex items-start gap-3 p-5 bg-white/[0.03] border border-white/10 rounded-xl">
+              <Clock size={20} className="text-[#c9533c] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs text-[#efe5cd]/40 uppercase tracking-wider mb-1">Winter Hours</p>
+                <p className="text-[#efe5cd] font-semibold">Mon – Sat · 10:00 AM – 8:30 PM</p>
+                <p className="text-[#efe5cd]/50 text-sm">Sunday closed</p>
+              </div>
+            </div>
+            <div className="flex items-start gap-3 p-5 bg-white/[0.03] border border-white/10 rounded-xl">
+              <MapPin size={20} className="text-[#c9533c] flex-shrink-0 mt-0.5" />
+              <div>
+                <p className="text-xs text-[#efe5cd]/40 uppercase tracking-wider mb-1">Location</p>
+                <p className="text-[#efe5cd] font-semibold">2212 W 1800 N Ste. B</p>
+                <p className="text-[#efe5cd]/50 text-sm">Clinton, UT</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Team link */}
+        <section className="pb-12 px-6 border-t border-white/[0.06] pt-10">
+          <div className="max-w-5xl mx-auto">
             <p className="text-xs font-semibold text-[#efe5cd]/30 uppercase tracking-wider mb-4">
               Team Resources
             </p>
@@ -412,5 +640,5 @@ export default function WedgiesPage() {
 export const metadata = {
   title: 'Wedgies | Greens, Proteins & Ice Cream',
   description:
-    'Fresh wedge salads, no-carb Eggys, Wacos, parfaits, and crazy good ice cream — all made to order at our Clinton, UT drive-thru.',
+    'Fresh wedge salads, Wedgito burritos, no-carb Eggys, Wacos, parfaits, and crazy good ice cream — made fresh to order at our Clinton, UT drive-thru.',
 };
