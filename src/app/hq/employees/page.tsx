@@ -41,6 +41,7 @@ interface Requirement {
   business_id: string;
   document_type_id: string;
   required: boolean;
+  document_types: { requires_signature: boolean; requires_file_upload: boolean } | null;
 }
 
 type EmployeeStatus = 'complete' | 'missing' | 'no-requirements';
@@ -134,7 +135,7 @@ export default async function EmployeesPage({
 
     supabase
       .from('business_document_requirements')
-      .select('business_id, document_type_id, required')
+      .select('business_id, document_type_id, required, document_types(requires_signature, requires_file_upload)')
       .eq('required', true),
 
     supabase
@@ -144,7 +145,7 @@ export default async function EmployeesPage({
   ]);
 
   const employees = (employeesRes.data || []) as unknown as RawEmployee[];
-  const requirements = (requirementsRes.data || []) as Requirement[];
+  const requirements = (requirementsRes.data || []) as unknown as Requirement[];
   const businesses = (businessesRes.data || []) as RawBusiness[];
 
   // ── Process employees ───────────────────────────────
@@ -157,8 +158,10 @@ export default async function EmployeesPage({
       .map((eb) => eb.businesses?.name)
       .filter((n): n is string => !!n);
 
+    // Only count steps that actually create employee_document records
     const requiredDocs = requirements.filter((r) =>
-      businessIds.includes(r.business_id)
+      businessIds.includes(r.business_id) &&
+      (r.document_types?.requires_signature || r.document_types?.requires_file_upload)
     );
 
     const completedDocs = (emp.employee_documents || []).filter(

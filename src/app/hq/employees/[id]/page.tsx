@@ -67,6 +67,8 @@ interface RawEmployee {
   email: string;
   phone: string | null;
   created_at: string;
+  confirmation_email_sent_at: string | null;
+  confirmation_email_opened_at: string | null;
   employee_businesses: RawEmployeeBusiness[];
   employee_documents: RawEmployeeDocument[];
 }
@@ -147,6 +149,7 @@ export default async function EmployeeDetailPage({
     .from('employees')
     .select(`
       id, first_name, last_name, email, phone, created_at,
+      confirmation_email_sent_at, confirmation_email_opened_at,
       employee_businesses (
         hire_date, active,
         businesses (
@@ -192,7 +195,9 @@ export default async function EmployeeDetailPage({
 
       const docs: ProcessedDocument[] = await Promise.all(
         (business.business_document_requirements || [])
-          .filter((r) => r.required && r.document_types)
+          .filter((r) => r.required && r.document_types &&
+            (r.document_types.requires_signature || r.document_types.requires_file_upload)
+          )
           .map(async (req) => {
             const docType = req.document_types!;
             const existing = docMap.get(`${business.id}:${docType.id}`);
@@ -283,6 +288,21 @@ export default async function EmployeeDetailPage({
                   <Calendar size={14} />
                   Added {formatDate(employee.created_at)}
                 </span>
+                {employee.confirmation_email_sent_at && (
+                  <span
+                    className="flex items-center gap-1.5 text-sm"
+                    style={{
+                      color: employee.confirmation_email_opened_at
+                        ? 'rgb(74 222 128)' // green-400
+                        : 'rgb(161 161 170)', // text-muted
+                    }}
+                  >
+                    <Mail size={14} />
+                    {employee.confirmation_email_opened_at
+                      ? `Email opened ${formatDateTime(employee.confirmation_email_opened_at)}`
+                      : `Confirmation sent · not yet opened`}
+                  </span>
+                )}
               </div>
             </div>
           </div>

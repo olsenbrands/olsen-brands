@@ -480,6 +480,12 @@ export async function POST(
           pdfUrl,
         });
 
+        // Record sent timestamp and fire the email
+        await supabase
+          .from('employees')
+          .update({ confirmation_email_sent_at: new Date().toISOString() })
+          .eq('id', employeeId);
+
         sendConfirmationEmail = fetch('https://api.sendgrid.com/v3/mail/send', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${sendgridKey}`, 'Content-Type': 'application/json' },
@@ -487,6 +493,8 @@ export async function POST(
             personalizations: [{ to: [{ email: employeeEmail }] }],
             from: { email: 'onboarding@olsenbrands.com', name: 'OlsenBrands Onboarding' },
             subject: `Welcome to ${business.name} — your onboarding is complete ✅`,
+            custom_args: { employee_id: employeeId }, // used by webhook to match open events
+            tracking_settings: { open_tracking: { enable: true } },
             content: [
               { type: 'text/plain', value: confirmEmail.text },
               { type: 'text/html', value: confirmEmail.html },
