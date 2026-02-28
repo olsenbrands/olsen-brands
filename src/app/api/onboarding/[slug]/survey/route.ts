@@ -37,32 +37,30 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to save survey.' }, { status: 500 });
   }
 
-  // Send email if RESEND_API_KEY is configured
-  const resendKey = process.env.RESEND_API_KEY;
-  if (resendKey && business) {
+  // Send email via SendGrid if SENDGRID_API_KEY is configured
+  const sendgridKey = process.env.SENDGRID_API_KEY;
+  if (sendgridKey && business) {
     const stars = '⭐'.repeat(rating);
     const clearText = wasClear === true ? 'Yes' : wasClear === false ? 'No' : 'Not answered';
-    const emailBody = `
-New onboarding feedback from ${firstName} ${lastName || ''} at ${business.name}
+    const emailBody = `New onboarding feedback from ${firstName} ${lastName || ''} at ${business.name}
 
 Rating: ${stars} (${rating}/5)
 Was everything clear? ${clearText}
-Feedback: ${feedback?.trim() || 'None provided'}
-    `.trim();
+Feedback: ${feedback?.trim() || 'None provided'}`;
 
-    await fetch('https://api.resend.com/emails', {
+    await fetch('https://api.sendgrid.com/v3/mail/send', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${resendKey}`,
+        'Authorization': `Bearer ${sendgridKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'Onboarding <onboarding@olsenbrands.com>',
-        to: ['jordan@olsenbrands.com'],
+        from: { email: 'onboarding@olsenbrands.com', name: 'OlsenBrands Onboarding' },
+        to: [{ email: 'jordan@olsenbrands.com' }],
         subject: `Onboarding feedback — ${firstName} at ${business.name} (${rating}/5 ⭐)`,
-        text: emailBody,
+        content: [{ type: 'text/plain', value: emailBody }],
       }),
-    }).catch((e) => console.error('Email send failed:', e));
+    }).catch((e) => console.error('SendGrid send failed:', e));
   }
 
   return NextResponse.json({ success: true });
