@@ -2,6 +2,17 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import { renderToBuffer, Document, Page, Text, View, Image, StyleSheet } from '@react-pdf/renderer';
 
+// Strip markdown formatting for plain-text PDF rendering
+function stripMarkdown(text: string, effectiveDate: string): string {
+  return text
+    .replace(/\{\{EFFECTIVE_DATE\}\}/g, effectiveDate)  // fill in date
+    .replace(/\*\*(.+?)\*\*/g, '$1')                    // **bold** → plain
+    .replace(/\*(.+?)\*/g, '$1')                        // *italic* → plain
+    .replace(/^#{1,6}\s+/gm, '')                        // ## headings → plain
+    .replace(/^---+$/gm, '─────────────────────────')   // --- → divider line
+    .replace(/^\s*[-•]\s+/gm, '  • ');                  // - bullet → • bullet
+}
+
 // PDF styles
 const styles = StyleSheet.create({
   page: {
@@ -304,7 +315,8 @@ export async function POST(
   }
 
   // 7. Generate PDF server-side
-  const signedAt = new Date().toLocaleString('en-US', {
+  const now = new Date();
+  const signedAt = now.toLocaleString('en-US', {
     timeZone: 'America/Denver',
     year: 'numeric',
     month: 'long',
@@ -313,6 +325,14 @@ export async function POST(
     minute: '2-digit',
     timeZoneName: 'short',
   });
+  const effectiveDate = now.toLocaleDateString('en-US', {
+    timeZone: 'America/Denver',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+
+  const cleanedContent = stripMarkdown(docType.content || '', effectiveDate);
 
   const pdfBuffer = await renderToBuffer(
     <PolicyPDF
@@ -323,7 +343,7 @@ export async function POST(
       employeeEmail={email}
       signedAt={signedAt}
       ipAddress={ipAddress}
-      policyContent={docType.content || ''}
+      policyContent={cleanedContent}
       signatureDataUrl={signatureDataUrl}
     />
   );
