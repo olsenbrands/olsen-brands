@@ -21,11 +21,15 @@ type DocumentType = {
   name: string;
   slug: string;
   description: string | null;
+  step_type: string; // 'signature' | 'file_upload' | 'informational' | 'app_download' | 'survey'
   requires_signature: boolean;
   requires_file_upload: boolean;
   requires_form_fill: boolean;
   current_version: string;
   content: string | null;
+  content_url: string | null;
+  app_store_url: string | null;
+  play_store_url: string | null;
 };
 
 type Business = {
@@ -82,6 +86,11 @@ export default function OnboardingPage() {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [completedDocs, setCompletedDocs] = useState<CompletedDoc[]>([]);
 
+  // Survey
+  const [surveyRating, setSurveyRating] = useState<number | null>(null);
+  const [surveyWasClear, setSurveyWasClear] = useState<boolean | null>(null);
+  const [surveyFeedback, setSurveyFeedback] = useState('');
+
   // Reset per-doc state when moving to a new doc
   const resetDocState = useCallback(() => {
     setSignatureDataUrl(null);
@@ -137,10 +146,9 @@ export default function OnboardingPage() {
     }
   }
 
-  function advanceOrComplete(newEmpId: string, completedDoc: CompletedDoc) {
-    const updated = [...completedDocs, completedDoc];
-    setCompletedDocs(updated);
-    setEmployeeId(newEmpId);
+  function advanceOrComplete(newEmpId: string | null, completedDoc: CompletedDoc | null) {
+    if (completedDoc) setCompletedDocs(prev => [...prev, completedDoc]);
+    if (newEmpId) setEmployeeId(newEmpId);
 
     if (activeDocIndex + 1 < documentTypes.length) {
       setActiveDocIndex(activeDocIndex + 1);
@@ -148,6 +156,10 @@ export default function OnboardingPage() {
     } else {
       setStep('complete');
     }
+  }
+
+  function handleInformationalAdvance() {
+    advanceOrComplete(null, null);
   }
 
   // Submit signature doc
@@ -196,6 +208,34 @@ export default function OnboardingPage() {
       const json = await res.json();
       if (!res.ok) return setSubmitError(json.error || 'Something went wrong. Please try again.');
       advanceOrComplete(employeeId, { documentId: json.documentId, pdfDownloadUrl: null });
+    } catch {
+      setSubmitError('Network error. Please check your connection and try again.');
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  // Submit survey
+  async function handleSurveySubmit() {
+    if (!surveyRating) return setSubmitError('Please select a rating before submitting.');
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const res = await fetch(`/api/onboarding/${slug}/survey`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          employeeId,
+          firstName: firstName.trim(),
+          lastName: lastName.trim(),
+          rating: surveyRating,
+          wasClear: surveyWasClear,
+          feedback: surveyFeedback,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) return setSubmitError(json.error || 'Something went wrong. Please try again.');
+      advanceOrComplete(null, null);
     } catch {
       setSubmitError('Network error. Please check your connection and try again.');
     } finally {
@@ -396,33 +436,33 @@ export default function OnboardingPage() {
                   Here&apos;s what you&apos;ll do on the next {totalDocs > 1 ? `${totalDocs} steps` : 'step'}:
                 </p>
                 <ul className="flex flex-col gap-2.5">
-                  {documentTypes.map((doc) => (
-                    <li key={doc.id} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      <span className="mt-0.5 flex-shrink-0 text-base leading-none">
-                        {doc.requires_signature ? '📋' : doc.requires_file_upload ? '📎' : '✅'}
-                      </span>
-                      <span>
-                        {doc.requires_signature && (
-                          <>
-                            <strong style={{ color: 'var(--text-primary)' }}>Read and sign our {doc.name}.</strong>{' '}
-                            This gives you a clear picture of what great performance looks like here and what we expect from our team.
-                          </>
-                        )}
-                        {doc.requires_file_upload && (
-                          <>
-                            <strong style={{ color: 'var(--text-primary)' }}>Upload your {doc.name}.</strong>{' '}
-                            Don&apos;t have it yet? No problem — just mark that you&apos;ll get it to us soon and we&apos;ll follow up.
-                          </>
-                        )}
-                        {!doc.requires_signature && !doc.requires_file_upload && (
-                          <>
-                            <strong style={{ color: 'var(--text-primary)' }}>{doc.name}.</strong>{' '}
-                            {doc.description ?? 'Complete this required document.'}
-                          </>
-                        )}
-                      </span>
-                    </li>
-                  ))}
+                  {documentTypes.map((doc) => {
+                    const icon =
+                      doc.step_type === 'signature' ? '📋'
+                      : doc.step_type === 'file_upload' ? '📎'
+                      : doc.step_type === 'informational' ? '💳'
+                      : doc.step_type === 'app_download' ? '📱'
+                      : doc.step_type === 'survey' ? '⭐'
+                      : '✅';
+                    const copy =
+                      doc.step_type === 'signature'
+                        ? <><strong style={{ color: 'var(--text-primary)' }}>Read and sign our {doc.name}.</strong>{' '}This sets clear expectations for what great performance looks like on our team.</>
+                      : doc.step_type === 'file_upload'
+                        ? <><strong style={{ color: 'var(--text-primary)' }}>Upload your {doc.name}.</strong>{' '}Don&apos;t have it yet? No problem — just let us know and we&apos;ll follow up.</>
+                      : doc.step_type === 'informational'
+                        ? <><strong style={{ color: 'var(--text-primary)' }}>{doc.name}.</strong>{' '}Important info you&apos;ll want to read before your first shift.</>
+                      : doc.step_type === 'app_download'
+                        ? <><strong style={{ color: 'var(--text-primary)' }}>Download {doc.name}.</strong>{' '}We&apos;ll walk you through getting set up with the apps your team uses every day.</>
+                      : doc.step_type === 'survey'
+                        ? <><strong style={{ color: 'var(--text-primary)' }}>Share your experience.</strong>{' '}A quick 30-second survey so we can keep making onboarding better.</>
+                      : <><strong style={{ color: 'var(--text-primary)' }}>{doc.name}.</strong>{' '}{doc.description ?? ''}</>;
+                    return (
+                      <li key={doc.id} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        <span className="mt-0.5 flex-shrink-0 text-base leading-none">{icon}</span>
+                        <span>{copy}</span>
+                      </li>
+                    );
+                  })}
                 </ul>
               </div>
             </div>
@@ -617,6 +657,169 @@ export default function OnboardingPage() {
 
                 <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
                   Your permit is stored securely and only accessible to management.
+                </p>
+              </>
+            )}
+
+            {/* ── Informational Step ── */}
+            {activeDoc.step_type === 'informational' && (
+              <>
+                {activeDoc.content && (
+                  <div className="rounded-lg p-5 text-sm leading-relaxed whitespace-pre-wrap"
+                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-secondary)' }}>
+                    {activeDoc.content}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleInformationalAdvance}
+                  className="w-full py-3 rounded font-medium text-sm transition-opacity hover:opacity-90"
+                  style={{ background: 'var(--accent)', color: '#ffffff' }}>
+                  Got it →
+                </button>
+              </>
+            )}
+
+            {/* ── App Download Step ── */}
+            {activeDoc.step_type === 'app_download' && (
+              <>
+                <p style={{ color: 'var(--text-secondary)' }}>
+                  {activeDoc.slug === 'mytoast-app'
+                    ? 'MyToast is where you see your schedule and request time off. Download it now and you\'ll be all set before your first shift.'
+                    : activeDoc.slug === 'band-app'
+                    ? 'Band is how your team communicates — schedule updates, announcements, shift changes, and team posts all live here. Download it and watch for an invite from your manager.'
+                    : `Download ${activeDoc.name} to stay connected with your team.`}
+                </p>
+
+                <div className="flex flex-col sm:flex-row gap-3">
+                  {activeDoc.app_store_url && (
+                    <a
+                      href={activeDoc.app_store_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-5 py-3.5 rounded-lg transition-opacity hover:opacity-80 flex-1 justify-center"
+                      style={{ background: '#000000', color: '#ffffff' }}
+                    >
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/>
+                      </svg>
+                      <span className="font-medium text-sm">App Store</span>
+                    </a>
+                  )}
+                  {activeDoc.play_store_url && (
+                    <a
+                      href={activeDoc.play_store_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 px-5 py-3.5 rounded-lg transition-opacity hover:opacity-80 flex-1 justify-center"
+                      style={{ background: '#01875f', color: '#ffffff' }}
+                    >
+                      <svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor">
+                        <path d="M3.18 23.76c.3.18.64.24.98.2L14.76 12 3.18 0c-.34-.04-.68.02-.98.2C1.6.62 1.25 1.2 1.25 2v19.98c0 .8.35 1.38.93 1.78zM16.54 13.77l-2.85-2.85 2.85-2.85 3.42 1.97c.98.56.98 1.48 0 2.04l-3.42 1.97-3.42 1.97zm-1.42-1.42L3.67 1.52l10.38 10.41-3.37 3.37 4.44-2.95z"/>
+                      </svg>
+                      <span className="font-medium text-sm">Google Play</span>
+                    </a>
+                  )}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={handleInformationalAdvance}
+                  className="w-full py-3 rounded font-medium text-sm transition-opacity hover:opacity-90"
+                  style={{ background: 'var(--accent)', color: '#ffffff' }}>
+                  {activeDocIndex + 1 < totalDocs ? `I've downloaded it →` : `All done →`}
+                </button>
+              </>
+            )}
+
+            {/* ── Survey Step ── */}
+            {activeDoc.step_type === 'survey' && (
+              <>
+                <p style={{ color: 'var(--text-secondary)' }}>
+                  You&apos;re almost done! Before you go, take 30 seconds to let us know how your onboarding went. Your feedback genuinely helps us make this better for the next person.
+                </p>
+
+                {/* Star rating */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    How was your overall onboarding experience?
+                  </label>
+                  <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                      <button
+                        key={star}
+                        type="button"
+                        onClick={() => setSurveyRating(star)}
+                        className="text-3xl transition-transform hover:scale-110 active:scale-95"
+                        style={{ opacity: surveyRating && star <= surveyRating ? 1 : 0.25 }}
+                      >
+                        ⭐
+                      </button>
+                    ))}
+                  </div>
+                  {surveyRating && (
+                    <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
+                      {surveyRating === 5 ? 'Amazing — glad to hear it! 🎉'
+                        : surveyRating === 4 ? 'Great! Thanks for the feedback.'
+                        : surveyRating === 3 ? 'Good to know. We\'ll work on it.'
+                        : surveyRating === 2 ? 'Sorry it wasn\'t smoother. We appreciate the honesty.'
+                        : 'We\'re sorry. We want to do better — tell us what happened below.'}
+                    </p>
+                  )}
+                </div>
+
+                {/* Was it clear? */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    Was everything clear and easy to understand?
+                  </label>
+                  <div className="flex gap-3">
+                    {[{ label: 'Yes', val: true }, { label: 'Not really', val: false }].map(({ label, val }) => (
+                      <button
+                        key={label}
+                        type="button"
+                        onClick={() => setSurveyWasClear(val)}
+                        className="px-4 py-2 rounded text-sm font-medium transition-all"
+                        style={{
+                          background: surveyWasClear === val ? 'var(--accent)' : 'var(--bg-secondary)',
+                          color: surveyWasClear === val ? '#ffffff' : 'var(--text-secondary)',
+                          border: `1px solid ${surveyWasClear === val ? 'var(--accent)' : 'var(--border)'}`,
+                        }}
+                      >
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Feedback */}
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    Any feedback or suggestions? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <textarea
+                    value={surveyFeedback}
+                    onChange={(e) => setSurveyFeedback(e.target.value)}
+                    placeholder="What could we improve? What worked well?"
+                    rows={3}
+                    className="px-3 py-2.5 rounded text-sm outline-none resize-none"
+                    style={{ background: 'var(--bg-secondary)', border: '1px solid var(--border)', color: 'var(--text-primary)' }}
+                  />
+                </div>
+
+                {submitError && <p className="text-sm" style={{ color: '#f44336' }}>{submitError}</p>}
+
+                <button
+                  type="button"
+                  disabled={!surveyRating || submitting}
+                  onClick={handleSurveySubmit}
+                  className="w-full py-3 rounded font-medium text-sm transition-opacity disabled:opacity-40"
+                  style={{ background: 'var(--accent)', color: '#ffffff' }}>
+                  {submitting ? <Spinner /> : 'Submit & Finish Onboarding →'}
+                </button>
+
+                <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
+                  Your feedback goes directly to management. Thanks for helping us improve.
                 </p>
               </>
             )}

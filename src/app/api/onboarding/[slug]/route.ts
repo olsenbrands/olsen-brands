@@ -25,20 +25,26 @@ export async function GET(
     .select(`
       id,
       required,
+      display_order,
       document_types (
         id,
         name,
         slug,
         description,
+        step_type,
         requires_signature,
         requires_file_upload,
         requires_form_fill,
         current_version,
-        content
+        content,
+        content_url,
+        app_store_url,
+        play_store_url
       )
     `)
     .eq('business_id', business.id)
-    .eq('required', true);
+    .eq('required', true)
+    .order('display_order', { ascending: true });
 
   if (reqError) {
     console.error('Error fetching requirements:', reqError);
