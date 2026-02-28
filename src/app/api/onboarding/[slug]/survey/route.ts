@@ -400,7 +400,7 @@ export async function POST(
       // Generate 90-day signed URL for the policy PDF
       let pdfUrl: string | null = null;
       const policyDoc = pdfResult.data?.find(
-        (d) => (d.document_types as { step_type: string } | null)?.step_type === 'signature'
+        (d) => (d.document_types as unknown as { step_type: string } | null)?.step_type === 'signature'
       );
       if (policyDoc?.file_path) {
         const { data: signedData } = await supabase.storage
@@ -411,7 +411,7 @@ export async function POST(
 
       // Build completed steps list from business requirements
       const completedSteps = (stepsResult.data ?? [])
-        .map((r) => r.document_types as { name: string; step_type: string } | null)
+        .map((r) => r.document_types as unknown as { name: string; step_type: string } | null)
         .filter(Boolean) as { name: string; step_type: string }[];
 
       if (employeeEmail && completedSteps.length > 0) {
