@@ -34,6 +34,7 @@ type Business = {
   slug: string;
   type: string | null;
   location: string | null;
+  welcome_copy: string | null;
 };
 
 type Step = 'identity' | 'document' | 'complete';
@@ -347,16 +348,48 @@ export default function OnboardingPage() {
 
         {/* ── Step: Identity ──────────────────────────────────────────────── */}
         {step === 'identity' && (
-          <form onSubmit={handleIdentitySubmit} className="flex flex-col gap-6">
-            <div>
-              <h2 className="text-xl font-semibold mb-1" style={{ color: 'var(--text-primary)' }}>
-                Welcome to {business.name}
-              </h2>
-              <p style={{ color: 'var(--text-secondary)' }}>
-                Please enter your name and email to get started. You'll complete {totalDocs} document{totalDocs !== 1 ? 's' : ''} today.
+          <form onSubmit={handleIdentitySubmit} className="flex flex-col gap-8">
+
+            {/* Welcome narrative */}
+            <div className="flex flex-col gap-5">
+              {/* Icon + heading */}
+              <div className="flex flex-col gap-3">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
+                  style={{ background: 'rgba(201,83,60,0.12)', border: '1px solid rgba(201,83,60,0.25)' }}
+                >
+                  🎉
+                </div>
+                <div>
+                  <h2 className="text-2xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
+                    Welcome to the {business.name} family.
+                  </h2>
+                  {business.location && (
+                    <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                      {business.location} · We&apos;re so glad you&apos;re here.
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Business narrative */}
+              <p className="text-base leading-relaxed" style={{ color: 'var(--text-secondary)' }}>
+                {business.welcome_copy ??
+                  `We work hard, take care of each other, and have a lot of fun doing it. You're joining a team that's genuinely excited to have you — and we can't wait to see what you bring.`}
               </p>
+
+              {/* Divider + next-steps cue */}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+                <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
+                  First things first — let&apos;s get your paperwork done.
+                </p>
+                <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
+                  Quick and painless. Just {totalDocs} document{totalDocs !== 1 ? 's' : ''} and you&apos;ll be all set.
+                </p>
+              </div>
             </div>
 
+            {/* Form fields */}
             <div className="flex flex-col gap-4">
               <div className="grid grid-cols-2 gap-4">
                 <div className="flex flex-col gap-1.5">
@@ -387,7 +420,7 @@ export default function OnboardingPage() {
 
             <button type="submit" className="w-full py-3 rounded font-medium text-sm transition-opacity hover:opacity-90"
               style={{ background: 'var(--accent)', color: '#ffffff' }}>
-              Continue →
+              Let&apos;s go →
             </button>
 
             <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
