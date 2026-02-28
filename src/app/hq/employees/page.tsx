@@ -33,6 +33,8 @@ interface RawEmployee {
   email: string;
   phone: string | null;
   created_at: string;
+  archived_at: string | null;
+  archived_reason: string | null;
   employee_businesses: RawEmployeeBusiness[];
   employee_documents: RawEmployeeDocument[];
 }
@@ -44,7 +46,7 @@ interface Requirement {
   document_types: { requires_signature: boolean; requires_file_upload: boolean } | null;
 }
 
-type EmployeeStatus = 'complete' | 'missing' | 'no-requirements';
+type EmployeeStatus = 'complete' | 'missing' | 'no-requirements' | 'archived';
 
 interface ProcessedEmployee {
   id: string;
@@ -57,6 +59,8 @@ interface ProcessedEmployee {
   completedCount: number;
   lastSubmission: string | null;
   status: EmployeeStatus;
+  archivedAt: string | null;
+  archivedReason: string | null;
 }
 
 // ─── Helpers ───────────────────────────────────────────
@@ -75,6 +79,13 @@ function StatusBadge({ status, completed, required }: {
   completed: number;
   required: number;
 }) {
+  if (status === 'archived') {
+    return (
+      <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--bg-tertiary)] text-[var(--text-muted)] border border-[var(--border)]">
+        Archived
+      </span>
+    );
+  }
   if (status === 'no-requirements') {
     return (
       <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-[var(--bg-tertiary)] text-[var(--text-muted)] border border-[var(--border)]">
@@ -123,6 +134,7 @@ export default async function EmployeesPage({
       .from('employees')
       .select(`
         id, first_name, last_name, email, phone, created_at,
+        archived_at, archived_reason,
         employee_businesses (
           hire_date, active,
           businesses ( id, name, slug )
@@ -186,7 +198,9 @@ export default async function EmployeesPage({
     );
 
     const status: EmployeeStatus =
-      requiredCount === 0
+      emp.archived_at
+        ? 'archived'
+        : requiredCount === 0
         ? 'no-requirements'
         : completedCount >= requiredCount
         ? 'complete'
@@ -203,11 +217,17 @@ export default async function EmployeesPage({
       completedCount,
       lastSubmission,
       status,
+      archivedAt: emp.archived_at,
+      archivedReason: emp.archived_reason,
     };
   });
 
   // ── Apply filters ────────────────────────────────────
-  let filtered = processed;
+  // By default show only active employees; archived only when explicitly requested
+  const showArchived = params.status === 'archived';
+  let filtered = processed.filter((e) =>
+    showArchived ? e.status === 'archived' : e.status !== 'archived'
+  );
 
   if (params.business) {
     filtered = filtered.filter((e) => e.businessIds.includes(params.business!));
@@ -226,10 +246,12 @@ export default async function EmployeesPage({
     );
   }
 
-  // ── Stats ───────────────────────────────────────────
-  const totalCount = processed.length;
-  const completeCount = processed.filter((e) => e.status === 'complete').length;
-  const missingCount = processed.filter((e) => e.status === 'missing').length;
+  // ── Stats (active employees only) ──────────────────
+  const active = processed.filter((e) => e.status !== 'archived');
+  const totalCount = active.length;
+  const completeCount = active.filter((e) => e.status === 'complete').length;
+  const missingCount = active.filter((e) => e.status === 'missing').length;
+  const archivedCount = processed.filter((e) => e.status === 'archived').length;
 
   return (
     <div className="p-6 space-y-6">
@@ -247,10 +269,10 @@ export default async function EmployeesPage({
       </div>
 
       {/* Summary stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-4 gap-4">
         <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl p-5">
           <div className="text-3xl font-bold text-[var(--text-primary)]">{totalCount}</div>
-          <div className="text-sm text-[var(--text-muted)] mt-1">Total Employees</div>
+          <div className="text-sm text-[var(--text-muted)] mt-1">Active Employees</div>
         </div>
         <div className="bg-[var(--bg-secondary)] border border-green-500/20 rounded-xl p-5">
           <div className="text-3xl font-bold text-green-400">{completeCount}</div>
@@ -260,7 +282,24 @@ export default async function EmployeesPage({
           <div className="text-3xl font-bold text-amber-400">{missingCount}</div>
           <div className="text-sm text-[var(--text-muted)] mt-1">Missing Items</div>
         </div>
+        <a
+          href={archivedCount > 0 ? '/hq/employees?status=archived' : '#'}
+          className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl p-5 block transition-opacity hover:opacity-80"
+        >
+          <div className="text-3xl font-bold text-[var(--text-muted)]">{archivedCount}</div>
+          <div className="text-sm text-[var(--text-muted)] mt-1">
+            Archived {archivedCount > 0 ? '→' : ''}
+          </div>
+        </a>
       </div>
+
+      {/* Archived view banner */}
+      {showArchived && (
+        <div className="flex items-center justify-between px-4 py-3 rounded-lg bg-[var(--bg-secondary)] border border-[var(--border)]">
+          <p className="text-sm text-[var(--text-muted)]">Showing archived (former) employees. Records are never deleted.</p>
+          <a href="/hq/employees" className="text-sm font-medium text-[var(--accent)] hover:opacity-80">← Back to active</a>
+        </div>
+      )}
 
       {/* Filters */}
       <FiltersWrapper businesses={businesses} />

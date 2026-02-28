@@ -15,7 +15,9 @@ import {
   Mail,
   Phone,
   Globe,
+  Archive,
 } from 'lucide-react';
+import ArchiveButton from './components/ArchiveButton';
 
 // ─── Types ─────────────────────────────────────────────
 
@@ -69,6 +71,8 @@ interface RawEmployee {
   created_at: string;
   confirmation_email_sent_at: string | null;
   confirmation_email_opened_at: string | null;
+  archived_at: string | null;
+  archived_reason: string | null;
   employee_businesses: RawEmployeeBusiness[];
   employee_documents: RawEmployeeDocument[];
 }
@@ -150,6 +154,7 @@ export default async function EmployeeDetailPage({
     .select(`
       id, first_name, last_name, email, phone, created_at,
       confirmation_email_sent_at, confirmation_email_opened_at,
+      archived_at, archived_reason,
       employee_businesses (
         hire_date, active,
         businesses (
@@ -262,6 +267,24 @@ export default async function EmployeeDetailPage({
         Back to Employees
       </Link>
 
+      {/* Archived banner */}
+      {employee.archived_at && (
+        <div className="flex items-start gap-3 px-5 py-4 rounded-xl border border-red-500/30 bg-red-500/5">
+          <Archive size={18} className="text-red-400 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-semibold text-red-400">
+              Archived {formatDateTime(employee.archived_at)}
+            </p>
+            {employee.archived_reason && (
+              <p className="text-xs text-[var(--text-muted)] mt-0.5">Reason: {employee.archived_reason}</p>
+            )}
+            <p className="text-xs text-[var(--text-muted)] mt-1">
+              All records and documents are preserved. Use the Restore button below to make this employee active again.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Employee card */}
       <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl p-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
@@ -307,20 +330,27 @@ export default async function EmployeeDetailPage({
             </div>
           </div>
 
-          {/* Overall completion */}
-          <div className="text-right">
-            <div
-              className={`text-3xl font-bold ${
-                totalComplete >= totalRequired && totalRequired > 0
-                  ? 'text-green-400'
-                  : totalComplete > 0
-                  ? 'text-amber-400'
-                  : 'text-[var(--text-muted)]'
-              }`}
-            >
-              {totalComplete}/{totalRequired}
+          {/* Overall completion + archive */}
+          <div className="flex flex-col items-end gap-3">
+            <div className="text-right">
+              <div
+                className={`text-3xl font-bold ${
+                  totalComplete >= totalRequired && totalRequired > 0
+                    ? 'text-green-400'
+                    : totalComplete > 0
+                    ? 'text-amber-400'
+                    : 'text-[var(--text-muted)]'
+                }`}
+              >
+                {totalComplete}/{totalRequired}
+              </div>
+              <div className="text-xs text-[var(--text-muted)] mt-0.5">docs complete</div>
             </div>
-            <div className="text-xs text-[var(--text-muted)] mt-0.5">docs complete</div>
+            <ArchiveButton
+              employeeId={employee.id}
+              isArchived={!!employee.archived_at}
+              employeeName={`${employee.first_name} ${employee.last_name}`}
+            />
           </div>
         </div>
       </div>
