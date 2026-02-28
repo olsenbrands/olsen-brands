@@ -1,6 +1,6 @@
 # OlsenBrands Employee Backend — Build Progress
-**Last Updated:** 2026-02-28  
-**Status:** 🟢 Phase 2 Built — Ready for Device Testing
+**Last Updated:** 2026-02-27  
+**Status:** 🟢 Phase 3 Built — HQ Employees Admin Hub Live
 
 ---
 
@@ -55,16 +55,17 @@
 ## Phase 3 — HQ Admin Hub
 > Goal: Jordan can visit /hq/employees and see all signed documents across all businesses.
 
-- [ ] Create `/hq/employees` route (protected)
-- [ ] Employee list table with columns: name, business(es), completion status, date
-- [ ] Filter by business dropdown
-- [ ] Filter by document status (complete / missing items / pending)
-- [ ] Search by employee name
-- [ ] Employee detail view (`/hq/employees/[id]`)
-- [ ] Document list per employee with status badges
-- [ ] PDF download button per document
-- [ ] File preview for uploads (permits, IDs)
-- [ ] "Missing documents" alert — incomplete employees flagged with count on HQ
+- [x] Create `/hq/employees` route (protected) ✅
+- [x] Employee list table with columns: name, business(es), completion status, date ✅
+- [x] Filter by business dropdown ✅
+- [x] Filter by document status (complete / missing items / pending) ✅
+- [x] Search by employee name ✅
+- [x] Employee detail view (`/hq/employees/[id]`) ✅
+- [x] Document list per employee with status badges ✅
+- [x] PDF download button per document (fresh signed URL, 1hr) ✅
+- [x] File preview for uploads (permits, IDs) ✅
+- [x] IP address audit trail on employee detail ✅
+- [ ] "Missing documents" alert — incomplete employees flagged with count on HQ dashboard
 - [ ] Business management page (`/hq/businesses`) — view/add/edit businesses
 - [ ] Document types management page (`/hq/documents`) — view/add/edit doc types
 - [ ] "Send reminder" button — manually trigger reminder email to employee with outstanding docs
