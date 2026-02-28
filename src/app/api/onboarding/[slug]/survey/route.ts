@@ -225,11 +225,13 @@ View in HQ: https://olsenbrands.com/hq`;
 function buildEmployeeConfirmationEmail({
   firstName,
   businessName,
+  logoUrl,
   completedSteps,
   pdfUrl,
 }: {
   firstName: string;
   businessName: string;
+  logoUrl: string | null;
   completedSteps: { name: string; step_type: string }[];
   pdfUrl: string | null;
 }): { html: string; text: string } {
@@ -277,7 +279,10 @@ function buildEmployeeConfirmationEmail({
               <p style="margin:8px 0 0;font-size:15px;color:#aaaaaa;">Welcome to the team, ${firstName}.</p>
             </td>
             <td align="right" valign="top">
-              <div style="background:${accentRed};border-radius:50%;width:48px;height:48px;text-align:center;line-height:48px;font-size:24px;">🦞</div>
+              ${logoUrl
+                ? `<img src="https://olsenbrands.com${logoUrl}" alt="${businessName} logo" width="56" height="56" style="border-radius:10px;object-fit:cover;display:block;" />`
+                : `<div style="background:${accentRed};border-radius:50%;width:48px;height:48px;text-align:center;line-height:48px;font-size:24px;">🎉</div>`
+              }
             </td>
           </tr></table>
         </td></tr>
@@ -374,7 +379,7 @@ export async function POST(
   // Get business
   const { data: business } = await supabase
     .from('businesses')
-    .select('id, name')
+    .select('id, name, logo_url')
     .eq('slug', slug)
     .single();
 
@@ -436,9 +441,9 @@ export async function POST(
         supabase.from('employees').select('email').eq('id', employeeId).single(),
         supabase
           .from('employee_documents')
-          .select('file_path, document_types(step_type)')
+          .select('pdf_url, document_types(step_type)')
           .eq('employee_id', employeeId)
-          .not('file_path', 'is', null)
+          .not('pdf_url', 'is', null)
           .order('created_at', { ascending: true }),
         supabase
           .from('business_document_requirements')
@@ -454,10 +459,10 @@ export async function POST(
       const policyDoc = pdfResult.data?.find(
         (d) => (d.document_types as unknown as { step_type: string } | null)?.step_type === 'signature'
       );
-      if (policyDoc?.file_path) {
+      if (policyDoc?.pdf_url) {
         const { data: signedData } = await supabase.storage
           .from('employee-documents')
-          .createSignedUrl(policyDoc.file_path, 60 * 60 * 24 * 90); // 90 days
+          .createSignedUrl(policyDoc.pdf_url, 60 * 60 * 24 * 90); // 90 days
         pdfUrl = signedData?.signedUrl ?? null;
       }
 
@@ -470,6 +475,7 @@ export async function POST(
         const confirmEmail = buildEmployeeConfirmationEmail({
           firstName: firstName || '',
           businessName: business.name,
+          logoUrl: (business as { logo_url?: string }).logo_url ?? null,
           completedSteps,
           pdfUrl,
         });
