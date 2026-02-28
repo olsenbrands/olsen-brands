@@ -431,7 +431,10 @@ export default function OnboardingPage() {
                     color: 'var(--text-secondary)',
                   }}
                 >
-                  {activeDoc.content}
+                  {activeDoc.content.replace(
+                    '{{EFFECTIVE_DATE}}',
+                    new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+                  )}
                 </div>
                 {!hasScrolledPolicy && (
                   <div
