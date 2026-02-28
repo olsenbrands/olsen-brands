@@ -55,8 +55,8 @@ Feedback: ${feedback?.trim() || 'None provided'}`;
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+        personalizations: [{ to: [{ email: 'jordan@olsenbrands.com' }] }],
         from: { email: 'onboarding@olsenbrands.com', name: 'OlsenBrands Onboarding' },
-        to: [{ email: 'jordan@olsenbrands.com' }],
         subject: `Onboarding feedback — ${firstName} at ${business.name} (${rating}/5 ⭐)`,
         content: [{ type: 'text/plain', value: emailBody }],
       }),
