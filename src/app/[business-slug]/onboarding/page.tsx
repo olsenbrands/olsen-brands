@@ -26,6 +26,8 @@ type DocumentType = {
   requires_file_upload: boolean;
   requires_form_fill: boolean;
   requires_acknowledgment: boolean;
+  allows_skip: boolean;
+  skip_link: string | null;
   current_version: string;
   content: string | null;
   content_url: string | null;
@@ -90,6 +92,9 @@ export default function OnboardingPage() {
   // Acknowledgment (informational steps with requires_acknowledgment = true)
   const [acknowledgmentChoice, setAcknowledgmentChoice] = useState<'done' | 'not-received' | null>(null);
 
+  // Skip upload (file_upload steps with allows_skip = true)
+  const [skipUpload, setSkipUpload] = useState(false);
+
   // Survey
   const [surveyRating, setSurveyRating] = useState<number | null>(null);
   const [surveyWasClear, setSurveyWasClear] = useState<boolean | null>(null);
@@ -103,6 +108,7 @@ export default function OnboardingPage() {
     setFilePreviewUrl(null);
     setSubmitError(null);
     setAcknowledgmentChoice(null);
+    setSkipUpload(false);
   }, []);
 
   useEffect(() => {
@@ -198,8 +204,15 @@ export default function OnboardingPage() {
 
   // Submit file upload doc
   async function handleUploadSubmit() {
-    if (!selectedFile || !employeeId) return;
     const activeDoc = documentTypes[activeDocIndex];
+
+    // Skip path: no file, employee acknowledged they don't have it yet
+    if (skipUpload && !selectedFile) {
+      advanceOrComplete(employeeId, null);
+      return;
+    }
+
+    if (!selectedFile || !employeeId) return;
     setSubmitting(true);
     setSubmitError(null);
 
@@ -607,22 +620,25 @@ export default function OnboardingPage() {
             {/* ── File Upload Document ── */}
             {activeDoc.requires_file_upload && (
               <>
-                <p style={{ color: 'var(--text-secondary)' }}>
-                  Upload a photo or PDF of your valid Food Handler's Permit. Make sure the name, date, and issuing authority are clearly visible.
-                </p>
+                {activeDoc.description && (
+                  <p style={{ color: 'var(--text-secondary)' }}>{activeDoc.description}</p>
+                )}
 
+                {/* Upload zone — dimmed when skip is checked */}
                 <div
-                  className="rounded flex flex-col items-center justify-center gap-3 cursor-pointer transition-colors"
+                  className="rounded flex flex-col items-center justify-center gap-3 cursor-pointer transition-all"
                   style={{
                     border: `2px dashed ${selectedFile ? 'var(--accent)' : 'var(--border)'}`,
                     padding: '32px 20px',
                     background: selectedFile ? 'rgba(201, 83, 60, 0.04)' : 'var(--bg-secondary)',
+                    opacity: skipUpload && !selectedFile ? 0.4 : 1,
+                    pointerEvents: skipUpload && !selectedFile ? 'none' : 'auto',
                   }}
                   onClick={() => fileInputRef.current?.click()}
                 >
                   {filePreviewUrl ? (
                     /* eslint-disable-next-line @next/next/no-img-element */
-                    <img src={filePreviewUrl} alt="Permit preview" className="max-h-48 rounded object-contain" />
+                    <img src={filePreviewUrl} alt="Document preview" className="max-h-48 rounded object-contain" />
                   ) : selectedFile ? (
                     <div className="flex items-center gap-2">
                       <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" style={{ color: 'var(--accent)' }}>
@@ -653,7 +669,10 @@ export default function OnboardingPage() {
                     ref={fileInputRef}
                     type="file"
                     accept="image/jpeg,image/png,image/webp,image/heic,application/pdf"
-                    onChange={handleFileChange}
+                    onChange={(e) => {
+                      handleFileChange(e);
+                      if (e.target.files?.[0]) setSkipUpload(false);
+                    }}
                     className="hidden"
                   />
                 </div>
@@ -669,11 +688,69 @@ export default function OnboardingPage() {
                   </button>
                 )}
 
+                {/* Skip option — only shown when allows_skip = true and no file selected */}
+                {activeDoc.allows_skip && !selectedFile && (
+                  <label
+                    className="flex items-start gap-3 rounded-lg p-4 cursor-pointer transition-all"
+                    style={{
+                      background: skipUpload ? 'rgba(255,193,7,0.06)' : 'var(--bg-secondary)',
+                      border: `1px solid ${skipUpload ? 'rgba(255,193,7,0.4)' : 'var(--border)'}`,
+                    }}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={skipUpload}
+                      onChange={(e) => setSkipUpload(e.target.checked)}
+                      className="mt-0.5 flex-shrink-0 accent-[#c9533c]"
+                    />
+                    <div>
+                      <p className="text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                        I don&apos;t have my {activeDoc.name} yet.
+                      </p>
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                        You&apos;ll still need to complete this before your first shift.
+                      </p>
+                    </div>
+                  </label>
+                )}
+
+                {/* Warning callout when skipping */}
+                {skipUpload && !selectedFile && (
+                  <div
+                    className="rounded-lg p-4 flex items-start gap-3"
+                    style={{ background: 'rgba(255,193,7,0.08)', border: '1px solid rgba(255,193,7,0.35)' }}
+                  >
+                    <span className="text-lg flex-shrink-0 mt-0.5">⚠️</span>
+                    <div>
+                      <p className="text-sm font-semibold" style={{ color: '#ffc107' }}>
+                        You need to complete this as soon as possible.
+                      </p>
+                      <p className="text-sm mt-1" style={{ color: 'var(--text-secondary)' }}>
+                        A valid Food Handler&apos;s Permit is required to work in food service in Utah.{' '}
+                        {activeDoc.skip_link && (
+                          <>
+                            You can complete it quickly online here:{' '}
+                            <a
+                              href={activeDoc.skip_link}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="font-semibold underline"
+                              style={{ color: '#ffc107' }}
+                            >
+                              Get your Utah Food Handler&apos;s Permit →
+                            </a>
+                          </>
+                        )}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
                 {submitError && <p className="text-sm" style={{ color: '#f44336' }}>{submitError}</p>}
 
                 <button
                   type="button"
-                  disabled={!selectedFile || submitting}
+                  disabled={(!selectedFile && !skipUpload) || submitting}
                   onClick={handleUploadSubmit}
                   className="w-full py-3 rounded font-medium text-sm transition-opacity disabled:opacity-40"
                   style={{ background: 'var(--accent)', color: '#ffffff' }}>
@@ -681,7 +758,9 @@ export default function OnboardingPage() {
                 </button>
 
                 <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
-                  Your permit is stored securely and only accessible to management.
+                  {skipUpload && !selectedFile
+                    ? 'Your response is recorded. Management will follow up.'
+                    : 'Your document is stored securely and only accessible to management.'}
                 </p>
               </>
             )}

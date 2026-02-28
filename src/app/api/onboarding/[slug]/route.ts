@@ -36,6 +36,8 @@ export async function GET(
         requires_file_upload,
         requires_form_fill,
         requires_acknowledgment,
+        allows_skip,
+        skip_link,
         current_version,
         content,
         content_url,
