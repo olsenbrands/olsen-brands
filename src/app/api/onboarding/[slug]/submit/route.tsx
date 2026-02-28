@@ -162,17 +162,20 @@ function PolicyPDF({
         <Text style={styles.sectionTitle}>Policy Document</Text>
         <Text style={styles.policyText}>{policyContent}</Text>
 
-        {/* Signature */}
+        {/* Signature block */}
         <View style={styles.signatureSection}>
-          <Text style={styles.sectionTitle}>Employee Signature</Text>
-          <Image style={styles.signatureImage} src={signatureDataUrl} />
-          <Text style={styles.signatureLabel}>
-            Signed by {employeeName} on {signedAt}
-          </Text>
-          <Text style={styles.policyText}>
-            By signing above, the employee acknowledges that they have read, understood,
-            and agree to abide by the policies outlined in this document.
-          </Text>
+          <View style={styles.metaRow}>
+            <Text style={styles.metaLabel}>Employee Full Name (Print):</Text>
+            <Text style={styles.metaValue}>{employeeName}</Text>
+          </View>
+          <View style={{ ...styles.metaRow, marginTop: 6 }}>
+            <Text style={styles.metaLabel}>Date:</Text>
+            <Text style={styles.metaValue}>{signedAt}</Text>
+          </View>
+          <View style={{ marginTop: 12 }}>
+            <Text style={{ ...styles.metaLabel, marginBottom: 4 }}>Signature:</Text>
+            <Image style={styles.signatureImage} src={signatureDataUrl} />
+          </View>
         </View>
 
         {/* Footer */}
