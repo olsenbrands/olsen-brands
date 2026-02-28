@@ -8,17 +8,24 @@ function buildSurveyEmail({
   rating,
   wasClear,
   feedback,
+  feltPrepared,
+  feltWelcomed,
+  heardFrom,
 }: {
   firstName: string;
   lastName: string;
   businessName: string;
-  rating: number;
+  rating: number | null;
   wasClear: boolean | null;
   feedback: string;
+  feltPrepared: number | null;
+  feltWelcomed: boolean | null;
+  heardFrom: string | null;
 }): { html: string; text: string } {
   const fullName = `${firstName} ${lastName}`.trim();
-  const stars = '★'.repeat(rating) + '☆'.repeat(5 - rating);
+  const stars = rating ? '★'.repeat(rating) + '☆'.repeat(5 - rating) : '—';
   const ratingLabel =
+    !rating ? 'Not answered' :
     rating === 5 ? 'Amazing' :
     rating === 4 ? 'Great' :
     rating === 3 ? 'Okay' :
@@ -27,6 +34,9 @@ function buildSurveyEmail({
     wasClear === true ? 'Yes — everything was clear' :
     wasClear === false ? 'No — something was confusing' :
     'Not answered';
+  const preparedLabels: Record<number, string> = { 1: 'Not at all', 2: 'A little', 3: 'Somewhat', 4: 'Pretty ready', 5: 'Totally ready' };
+  const preparedText = feltPrepared ? `${feltPrepared}/5 — ${preparedLabels[feltPrepared]}` : 'Not answered';
+  const welcomedText = feltWelcomed === true ? 'Yes, absolutely' : feltWelcomed === false ? 'Not really' : 'Not answered';
   const now = new Date().toLocaleDateString('en-US', {
     weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
   });
@@ -130,6 +140,39 @@ function buildSurveyEmail({
                 <!-- Divider -->
                 <tr><td style="border-top:1px solid ${borderColor};padding-bottom:24px;"></td></tr>
 
+                <!-- Quick stats row -->
+                <tr>
+                  <td style="padding-bottom:24px;">
+                    <table width="100%" cellpadding="0" cellspacing="0">
+                      <tr>
+                        <td width="33%" style="padding-right:8px;">
+                          <div style="background:#fafafa;border:1px solid ${borderColor};border-radius:6px;padding:12px;text-align:center;">
+                            <p style="margin:0;font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#999999;">Felt Prepared</p>
+                            <p style="margin:6px 0 0;font-size:15px;font-weight:700;color:#111111;">${feltPrepared ? `${feltPrepared}/5` : '—'}</p>
+                            <p style="margin:2px 0 0;font-size:11px;color:#888888;">${preparedText}</p>
+                          </div>
+                        </td>
+                        <td width="33%" style="padding-right:8px;">
+                          <div style="background:#fafafa;border:1px solid ${borderColor};border-radius:6px;padding:12px;text-align:center;">
+                            <p style="margin:0;font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#999999;">Felt Welcomed</p>
+                            <p style="margin:6px 0 0;font-size:20px;">${feltWelcomed === true ? '😊' : feltWelcomed === false ? '😐' : '—'}</p>
+                            <p style="margin:2px 0 0;font-size:11px;color:#888888;">${welcomedText}</p>
+                          </div>
+                        </td>
+                        <td width="33%">
+                          <div style="background:#fafafa;border:1px solid ${borderColor};border-radius:6px;padding:12px;text-align:center;">
+                            <p style="margin:0;font-size:10px;font-weight:600;letter-spacing:0.07em;text-transform:uppercase;color:#999999;">Heard From</p>
+                            <p style="margin:6px 0 0;font-size:13px;font-weight:600;color:#111111;">${heardFrom ?? '—'}</p>
+                          </div>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+
+                <!-- Divider -->
+                <tr><td style="border-top:1px solid ${borderColor};padding-bottom:24px;"></td></tr>
+
                 <!-- Feedback -->
                 <tr>
                   <td>
@@ -165,8 +208,11 @@ function buildSurveyEmail({
 
   const text = `New onboarding feedback from ${fullName} at ${businessName}
 
-Rating: ${rating}/5 — ${ratingLabel}
+Rating: ${rating ? `${rating}/5 — ${ratingLabel}` : 'Not answered'}
+Felt prepared: ${preparedText}
 Was everything clear? ${clearText}
+Felt welcomed? ${welcomedText}
+Heard from: ${heardFrom ?? 'Not answered'}
 Feedback: ${feedback || 'None provided'}
 
 Date: ${now}
@@ -318,11 +364,11 @@ export async function POST(
 ) {
   const { slug } = await params;
   const body = await req.json();
-  const { employeeId, firstName, lastName, rating, wasClear, feedback } = body;
+  const { employeeId, firstName, lastName, rating, wasClear, feedback, feltPrepared, feltWelcomed, heardFrom } = body;
 
-  // Validate
-  if (!rating || rating < 1 || rating > 5) {
-    return NextResponse.json({ error: 'Please select a rating.' }, { status: 400 });
+  // All survey fields are optional — validate types only if provided
+  if (rating !== null && rating !== undefined && (rating < 1 || rating > 5)) {
+    return NextResponse.json({ error: 'Invalid rating value.' }, { status: 400 });
   }
 
   // Get business
@@ -338,9 +384,12 @@ export async function POST(
     business_id: business?.id || null,
     employee_name: firstName && lastName ? `${firstName} ${lastName}` : null,
     business_slug: slug,
-    rating,
+    rating: rating ?? null,
     was_clear: wasClear ?? null,
     feedback: feedback?.trim() || null,
+    felt_prepared: feltPrepared ?? null,
+    felt_welcomed: feltWelcomed ?? null,
+    heard_from: heardFrom ?? null,
   });
 
   if (error) {
@@ -356,9 +405,12 @@ export async function POST(
       firstName: firstName || '',
       lastName: lastName || '',
       businessName: business.name,
-      rating,
+      rating: rating ?? null,
       wasClear: wasClear ?? null,
       feedback: feedback?.trim() || '',
+      feltPrepared: feltPrepared ?? null,
+      feltWelcomed: feltWelcomed ?? null,
+      heardFrom: heardFrom ?? null,
     });
 
     const sendSurveyEmail = fetch('https://api.sendgrid.com/v3/mail/send', {

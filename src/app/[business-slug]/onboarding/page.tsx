@@ -99,6 +99,9 @@ export default function OnboardingPage() {
   const [surveyRating, setSurveyRating] = useState<number | null>(null);
   const [surveyWasClear, setSurveyWasClear] = useState<boolean | null>(null);
   const [surveyFeedback, setSurveyFeedback] = useState('');
+  const [surveyFeltPrepared, setSurveyFeltPrepared] = useState<number | null>(null);
+  const [surveyFeltWelcomed, setSurveyFeltWelcomed] = useState<boolean | null>(null);
+  const [surveyHeardFrom, setSurveyHeardFrom] = useState<string | null>(null);
 
   // Reset per-doc state when moving to a new doc
   const resetDocState = useCallback(() => {
@@ -235,7 +238,6 @@ export default function OnboardingPage() {
 
   // Submit survey
   async function handleSurveySubmit() {
-    if (!surveyRating) return setSubmitError('Please select a rating before submitting.');
     setSubmitting(true);
     setSubmitError(null);
     try {
@@ -249,6 +251,9 @@ export default function OnboardingPage() {
           rating: surveyRating,
           wasClear: surveyWasClear,
           feedback: surveyFeedback,
+          feltPrepared: surveyFeltPrepared,
+          feltWelcomed: surveyFeltWelcomed,
+          heardFrom: surveyHeardFrom,
         }),
       });
       const json = await res.json();
@@ -933,23 +938,19 @@ export default function OnboardingPage() {
             {activeDoc.step_type === 'survey' && (
               <>
                 <p style={{ color: 'var(--text-secondary)' }}>
-                  You&apos;re almost done! Before you go, take 30 seconds to let us know how your onboarding went. Your feedback genuinely helps us make this better for the next person.
+                  You&apos;re almost done! All questions are optional — but your answers genuinely help us make this better for the next person.
                 </p>
 
-                {/* Star rating */}
+                {/* Q1: Overall rating */}
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    How was your overall onboarding experience?
+                    How was your overall onboarding experience? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
                   </label>
                   <div className="flex gap-2">
                     {[1, 2, 3, 4, 5].map((star) => (
-                      <button
-                        key={star}
-                        type="button"
-                        onClick={() => setSurveyRating(star)}
+                      <button key={star} type="button" onClick={() => setSurveyRating(surveyRating === star ? null : star)}
                         className="text-3xl transition-transform hover:scale-110 active:scale-95"
-                        style={{ opacity: surveyRating && star <= surveyRating ? 1 : 0.25 }}
-                      >
+                        style={{ opacity: surveyRating && star <= surveyRating ? 1 : 0.25 }}>
                         ⭐
                       </button>
                     ))}
@@ -965,34 +966,101 @@ export default function OnboardingPage() {
                   )}
                 </div>
 
-                {/* Was it clear? */}
+                {/* Q2: Prepared for first shift */}
                 <div className="flex flex-col gap-2">
                   <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    Was everything clear and easy to understand?
+                    How prepared do you feel for your first shift? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <div className="flex gap-2">
+                    {[
+                      { val: 1, label: 'Not at all' },
+                      { val: 2, label: 'A little' },
+                      { val: 3, label: 'Somewhat' },
+                      { val: 4, label: 'Pretty ready' },
+                      { val: 5, label: 'Totally ready' },
+                    ].map(({ val, label }) => (
+                      <button key={val} type="button"
+                        onClick={() => setSurveyFeltPrepared(surveyFeltPrepared === val ? null : val)}
+                        className="flex-1 py-2 rounded text-xs font-medium transition-all"
+                        style={{
+                          background: surveyFeltPrepared === val ? 'var(--accent)' : 'var(--bg-secondary)',
+                          color: surveyFeltPrepared === val ? '#ffffff' : 'var(--text-secondary)',
+                          border: `1px solid ${surveyFeltPrepared === val ? 'var(--accent)' : 'var(--border)'}`,
+                        }}>
+                        <span className="block text-base">{val}</span>
+                        <span className="block" style={{ fontSize: '9px', opacity: 0.75 }}>{label}</span>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q3: Was it clear */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    Was everything clear and easy to understand? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
                   </label>
                   <div className="flex gap-3">
                     {[{ label: 'Yes', val: true }, { label: 'Not really', val: false }].map(({ label, val }) => (
-                      <button
-                        key={label}
-                        type="button"
-                        onClick={() => setSurveyWasClear(val)}
+                      <button key={label} type="button"
+                        onClick={() => setSurveyWasClear(surveyWasClear === val ? null : val)}
                         className="px-4 py-2 rounded text-sm font-medium transition-all"
                         style={{
                           background: surveyWasClear === val ? 'var(--accent)' : 'var(--bg-secondary)',
                           color: surveyWasClear === val ? '#ffffff' : 'var(--text-secondary)',
                           border: `1px solid ${surveyWasClear === val ? 'var(--accent)' : 'var(--border)'}`,
-                        }}
-                      >
+                        }}>
                         {label}
                       </button>
                     ))}
                   </div>
                 </div>
 
-                {/* Feedback */}
+                {/* Q4: Felt welcomed */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    Did you feel welcomed? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <div className="flex gap-3">
+                    {[{ label: '😊 Yes, absolutely', val: true }, { label: '😐 Not really', val: false }].map(({ label, val }) => (
+                      <button key={label} type="button"
+                        onClick={() => setSurveyFeltWelcomed(surveyFeltWelcomed === val ? null : val)}
+                        className="px-4 py-2 rounded text-sm font-medium transition-all"
+                        style={{
+                          background: surveyFeltWelcomed === val ? 'var(--accent)' : 'var(--bg-secondary)',
+                          color: surveyFeltWelcomed === val ? '#ffffff' : 'var(--text-secondary)',
+                          border: `1px solid ${surveyFeltWelcomed === val ? 'var(--accent)' : 'var(--border)'}`,
+                        }}>
+                        {label}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q5: How did you hear about us */}
+                <div className="flex flex-col gap-2">
+                  <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
+                    How did you hear about this position? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {['Indeed', 'Friend or referral', 'Social media', 'Walk-in', 'Other'].map((option) => (
+                      <button key={option} type="button"
+                        onClick={() => setSurveyHeardFrom(surveyHeardFrom === option ? null : option)}
+                        className="px-3 py-2 rounded text-sm font-medium transition-all"
+                        style={{
+                          background: surveyHeardFrom === option ? 'var(--accent)' : 'var(--bg-secondary)',
+                          color: surveyHeardFrom === option ? '#ffffff' : 'var(--text-secondary)',
+                          border: `1px solid ${surveyHeardFrom === option ? 'var(--accent)' : 'var(--border)'}`,
+                        }}>
+                        {option}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Q6: Open feedback */}
                 <div className="flex flex-col gap-1.5">
                   <label className="text-sm font-medium" style={{ color: 'var(--text-secondary)' }}>
-                    Any feedback or suggestions? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
+                    Anything else you want us to know? <span style={{ color: 'var(--text-muted)', fontWeight: 400 }}>(optional)</span>
                   </label>
                   <textarea
                     value={surveyFeedback}
@@ -1008,7 +1076,7 @@ export default function OnboardingPage() {
 
                 <button
                   type="button"
-                  disabled={!surveyRating || submitting}
+                  disabled={submitting}
                   onClick={handleSurveySubmit}
                   className="w-full py-3 rounded font-medium text-sm transition-opacity disabled:opacity-40"
                   style={{ background: 'var(--accent)', color: '#ffffff' }}>
@@ -1016,7 +1084,7 @@ export default function OnboardingPage() {
                 </button>
 
                 <p className="text-xs text-center" style={{ color: 'var(--text-muted)' }}>
-                  Your feedback goes directly to management. Thanks for helping us improve.
+                  All questions are optional. Your feedback goes directly to management.
                 </p>
               </>
             )}
