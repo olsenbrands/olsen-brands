@@ -358,31 +358,51 @@ export default function OnboardingPage() {
 
   return (
     <div className="min-h-screen" style={{ background: 'var(--bg-primary)' }}>
-      {/* Top bar */}
-      <div className="w-full px-6 py-4 flex items-center gap-3"
-        style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
-        <div>
-          <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
-            Employee Onboarding
-          </p>
-          <p className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
-            {business.name}
-          </p>
+      {/* Header + progress */}
+      <div style={{ background: 'var(--bg-secondary)', borderBottom: '1px solid var(--border)' }}>
+        {/* Top row */}
+        <div className="px-6 pt-4 pb-2 flex items-start justify-between">
+          <div>
+            <p className="text-xs font-medium uppercase tracking-widest" style={{ color: 'var(--text-muted)' }}>
+              Employee Onboarding
+            </p>
+            <p className="text-base font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {business.name}
+            </p>
+          </div>
+          {/* Big step counter */}
+          <div className="text-right">
+            <p className="leading-none">
+              <span className="text-3xl font-bold tabular-nums" style={{ color: 'var(--text-primary)' }}>
+                {currentStepNum}
+              </span>
+              <span className="text-base font-medium" style={{ color: 'var(--text-muted)' }}> / {totalSteps}</span>
+            </p>
+            <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>steps complete</p>
+          </div>
         </div>
-        <div className="ml-auto text-xs" style={{ color: 'var(--text-muted)' }}>
-          Step {currentStepNum} of {totalSteps}
-        </div>
-      </div>
 
-      {/* Progress bar */}
-      <div className="w-full h-1" style={{ background: 'var(--border)' }}>
-        <div
-          className="h-1 transition-all duration-500"
-          style={{
-            background: 'var(--accent)',
-            width: `${(currentStepNum / totalSteps) * 100}%`,
-          }}
-        />
+        {/* Current step label */}
+        <div className="px-6 pb-2">
+          <p className="text-xs font-semibold uppercase tracking-widest" style={{ color: 'var(--accent)' }}>
+            {step === 'identity' ? 'Getting started' : activeDoc ? activeDoc.name : ''}
+          </p>
+        </div>
+
+        {/* Segmented progress bar — one pill per step */}
+        <div className="px-6 pb-4 flex gap-1.5">
+          {Array.from({ length: totalSteps }, (_, i) => i + 1).map((s) => (
+            <div
+              key={s}
+              className="flex-1 rounded-full transition-all duration-500"
+              style={{
+                height: '6px',
+                background: s <= currentStepNum ? 'var(--accent)' : 'var(--border)',
+                opacity: s < currentStepNum ? 0.45 : s === currentStepNum ? 1 : 0.2,
+              }}
+            />
+          ))}
+        </div>
       </div>
 
       <div className="max-w-2xl mx-auto px-4 py-8">
