@@ -1,0 +1,119 @@
+# OlsenBrands Employee Backend — Build Progress
+**Last Updated:** 2026-02-24  
+**Status:** 🟢 Phase 1 Complete — Ready for Phase 2
+
+---
+
+## Open Questions
+- [x] Employee identification method → **Name + email only, no account** ✅
+- [x] Re-signing behavior when policy updated → **Yes, email employees + flag in HQ** ✅
+- [x] Admin notifications → **Email + HQ backend dashboard** ✅
+- [x] Notify employees who haven't filled out yet → **Yes** ✅
+- [x] Admin role scope → **Jordan + Jennifer only for now** ✅
+- [x] Language support → **English only** ✅
+- [ ] Document expiration tracking → Deferred to Phase 5
+
+---
+
+## Phase 1 — Foundation (Database + Seed Data)
+> Goal: All tables exist in Supabase, 7 businesses seeded, initial document type created.
+
+- [x] Create `businesses` table ✅
+- [x] Create `employees` table ✅
+- [x] Create `employee_businesses` table ✅
+- [x] Create `document_types` table ✅
+- [x] Create `business_document_requirements` table ✅
+- [x] Create `employee_documents` table ✅
+- [x] Create Supabase Storage bucket (`employee-documents`, private) ✅
+- [x] Seed 7 businesses (Wedgie's, 3x Subway, 3x FiiZ) ✅
+- [x] Create "Employee Policy Acknowledgment" document type ✅
+- [x] Store Wedgie's Employee Policy v1.0 content in document_types ✅
+
+---
+
+## Phase 2 — Wedgie's Onboarding Page (Proof of Concept)
+> Goal: An employee can visit /wedgies/onboarding, sign the policy, and their record is saved.
+
+- [ ] Create `/[business-slug]/onboarding` dynamic route
+- [ ] Build employee identification step (name + email form)
+- [ ] Build onboarding checklist UI (shows required docs for that business)
+- [ ] Build policy viewer component (scrollable full text)
+- [ ] Integrate `react-signature-canvas` signature pad
+- [ ] PDF generation on submission (`@react-pdf/renderer`)
+- [ ] Upload signature PNG to Supabase Storage
+- [ ] Upload generated PDF to Supabase Storage
+- [ ] Save `employee_documents` record to Supabase
+- [ ] Save/upsert `employees` record
+- [ ] Save/upsert `employee_businesses` record
+- [ ] Build success/confirmation screen with PDF download link
+- [ ] Send confirmation email to employee on completion
+- [ ] Mobile-first responsive design
+- [ ] Test on actual phone
+
+---
+
+## Phase 3 — HQ Admin Hub
+> Goal: Jordan can visit /hq/employees and see all signed documents across all businesses.
+
+- [ ] Create `/hq/employees` route (protected)
+- [ ] Employee list table with columns: name, business(es), completion status, date
+- [ ] Filter by business dropdown
+- [ ] Filter by document status (complete / missing items / pending)
+- [ ] Search by employee name
+- [ ] Employee detail view (`/hq/employees/[id]`)
+- [ ] Document list per employee with status badges
+- [ ] PDF download button per document
+- [ ] File preview for uploads (permits, IDs)
+- [ ] "Missing documents" alert — incomplete employees flagged with count on HQ
+- [ ] Business management page (`/hq/businesses`) — view/add/edit businesses
+- [ ] Document types management page (`/hq/documents`) — view/add/edit doc types
+- [ ] "Send reminder" button — manually trigger reminder email to employee with outstanding docs
+- [ ] Policy version management — when policy updates, flag all prior signers as needing re-sign
+- [ ] Re-sign notification email — sent to employees when a new policy version is published
+
+---
+
+## Phase 4 — Multi-Business Expansion
+> Goal: All 7 businesses have working onboarding pages.
+
+- [ ] Verify dynamic routing works for all 7 business slugs
+- [ ] Test FiiZ onboarding flow end-to-end
+- [ ] Test Subway onboarding flow end-to-end
+- [ ] Admin notification on employee onboarding completion
+- [ ] Assign correct document requirements per business in DB
+- [ ] Verify admin hub shows all 7 businesses correctly
+
+---
+
+## Phase 5 — Advanced Features (Future)
+> These are not scheduled — capture for later.
+
+- [ ] Document expiration tracking (food handler permits)
+- [ ] Expiration reminder emails/texts to employees
+- [ ] Employee email notifications on completion
+- [ ] Additional document types: Food Handler Permit, ID Upload, Emergency Contact, I-9, W-4
+- [ ] Policy versioning — re-sign flow when policy updates
+- [ ] Manager-level access (location-scoped)
+- [ ] Spanish language support
+- [ ] Bulk export of all documents (zip download)
+- [ ] Reporting dashboard (completion rates per business, trend over time)
+
+---
+
+## Completed
+*(Nothing yet — build hasn't started)*
+
+---
+
+## Notes & Decisions Log
+| Date | Decision | Notes |
+|------|----------|-------|
+| 2026-02-24 | PRD created | Open questions resolved same session |
+| 2026-02-24 | Employee auth | Name + email only — no accounts |
+| 2026-02-24 | Notifications | Email to employees + HQ dashboard for admins |
+| 2026-02-24 | Admin scope | Jordan + Jennifer only for now |
+| 2026-02-24 | Language | English only |
+| 2026-02-24 | Expiration tracking | Deferred to Phase 5 |
+| 2026-02-24 | Email service | Brevo (Jordan already has account) |
+| 2026-02-24 | Admin users | Jordan (jordan@olsenbrands.com) + Jennifer (jennifer@olsenbrands.com) |
+| 2026-02-24 | Phase 1 complete | 6 tables created, storage bucket live, 7 businesses seeded, policy v1.0 loaded |
