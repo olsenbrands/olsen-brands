@@ -452,7 +452,7 @@ export default function OnboardingPage() {
                       : doc.step_type === 'informational'
                         ? <><strong style={{ color: 'var(--text-primary)' }}>{doc.name}.</strong>{' '}Important info you&apos;ll want to read before your first shift.</>
                       : doc.step_type === 'app_download'
-                        ? <><strong style={{ color: 'var(--text-primary)' }}>Download {doc.name}.</strong>{' '}We&apos;ll walk you through getting set up with the apps your team uses every day.</>
+                        ? <><strong style={{ color: 'var(--text-primary)' }}>{doc.name}.</strong>{' '}We&apos;ll walk you through getting set up with the apps your team uses every day.</>
                       : doc.step_type === 'survey'
                         ? <><strong style={{ color: 'var(--text-primary)' }}>Share your experience.</strong>{' '}A quick 30-second survey so we can keep making onboarding better.</>
                       : <><strong style={{ color: 'var(--text-primary)' }}>{doc.name}.</strong>{' '}{doc.description ?? ''}</>;
