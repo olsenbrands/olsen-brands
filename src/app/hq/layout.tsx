@@ -14,11 +14,13 @@ import {
   X,
   Clock,
   Calendar,
-  ArrowLeft
+  ArrowLeft,
+  Users
 } from 'lucide-react';
 
 const navItems = [
   { href: '/hq', label: 'Dashboard', icon: Command },
+  { href: '/hq/employees', label: 'Employees', icon: Users },
   { href: '/hq/vault', label: 'Vault', icon: Archive },
   { href: '/hq/missions', label: 'Missions', icon: Target },
   { href: '/hq/intel', label: 'Intel', icon: Radio },
