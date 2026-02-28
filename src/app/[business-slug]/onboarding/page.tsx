@@ -378,14 +378,43 @@ export default function OnboardingPage() {
                   `We work hard, take care of each other, and have a lot of fun doing it. You're joining a team that's genuinely excited to have you — and we can't wait to see what you bring.`}
               </p>
 
-              {/* Divider + next-steps cue */}
-              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }}>
+              {/* Divider + what-to-expect */}
+              <div style={{ borderTop: '1px solid var(--border)', paddingTop: '1.25rem' }} className="flex flex-col gap-3">
                 <p className="font-semibold text-sm" style={{ color: 'var(--text-primary)' }}>
-                  First things first — let&apos;s get your paperwork done.
+                  First things first — let&apos;s get your paperwork completed.
                 </p>
-                <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-                  Quick and painless. Just {totalDocs} document{totalDocs !== 1 ? 's' : ''} and you&apos;ll be all set.
+                <p className="text-sm" style={{ color: 'var(--text-muted)' }}>
+                  Here&apos;s what you&apos;ll do on the next {totalDocs > 1 ? `${totalDocs} steps` : 'step'}:
                 </p>
+                <ul className="flex flex-col gap-2.5">
+                  {documentTypes.map((doc) => (
+                    <li key={doc.id} className="flex items-start gap-2.5 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      <span className="mt-0.5 flex-shrink-0 text-base leading-none">
+                        {doc.requires_signature ? '📋' : doc.requires_file_upload ? '📎' : '✅'}
+                      </span>
+                      <span>
+                        {doc.requires_signature && (
+                          <>
+                            <strong style={{ color: 'var(--text-primary)' }}>Read and sign our {doc.name}.</strong>{' '}
+                            This gives you a clear picture of what great performance looks like here and what we expect from our team.
+                          </>
+                        )}
+                        {doc.requires_file_upload && (
+                          <>
+                            <strong style={{ color: 'var(--text-primary)' }}>Upload your {doc.name}.</strong>{' '}
+                            Don&apos;t have it yet? No problem — just mark that you&apos;ll get it to us soon and we&apos;ll follow up.
+                          </>
+                        )}
+                        {!doc.requires_signature && !doc.requires_file_upload && (
+                          <>
+                            <strong style={{ color: 'var(--text-primary)' }}>{doc.name}.</strong>{' '}
+                            {doc.description ?? 'Complete this required document.'}
+                          </>
+                        )}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
 
