@@ -10,7 +10,7 @@ export async function GET(
   // Fetch business by slug
   const { data: business, error: bizError } = await supabase
     .from('businesses')
-    .select('id, name, slug, type, location, welcome_copy')
+    .select('id, name, slug, type, location, welcome_copy, logo_url')
     .eq('slug', slug)
     .eq('active', true)
     .single();

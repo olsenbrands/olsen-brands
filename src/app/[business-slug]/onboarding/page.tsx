@@ -35,6 +35,7 @@ type Business = {
   type: string | null;
   location: string | null;
   welcome_copy: string | null;
+  logo_url: string | null;
 };
 
 type Step = 'identity' | 'document' | 'complete';
@@ -352,14 +353,22 @@ export default function OnboardingPage() {
 
             {/* Welcome narrative */}
             <div className="flex flex-col gap-5">
-              {/* Icon + heading */}
-              <div className="flex flex-col gap-3">
-                <div
-                  className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
-                  style={{ background: 'rgba(201,83,60,0.12)', border: '1px solid rgba(201,83,60,0.25)' }}
-                >
-                  🎉
-                </div>
+              {/* Logo / icon + heading */}
+              <div className="flex flex-col gap-4">
+                {business.logo_url ? (
+                  <img
+                    src={business.logo_url}
+                    alt={`${business.name} logo`}
+                    className="w-20 h-20 rounded-xl object-cover"
+                  />
+                ) : (
+                  <div
+                    className="w-14 h-14 rounded-2xl flex items-center justify-center text-2xl"
+                    style={{ background: 'rgba(201,83,60,0.12)', border: '1px solid rgba(201,83,60,0.25)' }}
+                  >
+                    🎉
+                  </div>
+                )}
                 <div>
                   <h2 className="text-2xl font-bold leading-tight" style={{ color: 'var(--text-primary)' }}>
                     Welcome to the {business.name} family.
