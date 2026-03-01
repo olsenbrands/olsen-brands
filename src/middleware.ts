@@ -31,20 +31,23 @@ export function middleware(request: NextRequest) {
   // Handle HQ routes
   if (isHQRoute) {
     const hqAuthCookie = request.cookies.get('hq-auth');
-    
-    if (hqAuthCookie?.value === 'authenticated') {
-      return NextResponse.next();
-    }
 
     // If this is a login attempt
     if (request.method === 'POST' && pathname === '/api/auth/login') {
       return NextResponse.next();
     }
 
-    // Redirect to login page
-    const loginUrl = new URL('/login', request.url);
-    loginUrl.searchParams.set('redirect', pathname);
-    return NextResponse.redirect(loginUrl);
+    if (hqAuthCookie?.value !== 'authenticated') {
+      // Redirect unauthenticated visitors to login
+      const loginUrl = new URL('/login', request.url);
+      loginUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    // Authenticated — serve the page but hard-block all crawlers at the HTTP level
+    const response = NextResponse.next();
+    response.headers.set('X-Robots-Tag', 'noindex, nofollow, noarchive, nosnippet, noimageindex');
+    return response;
   }
 
   // Allow robots.txt
