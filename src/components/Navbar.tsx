@@ -10,7 +10,6 @@ const navLinks = [
   { label: "Software", href: "/#software" },
   { label: "Our Story", href: "/story" },
   { label: "Contact", href: "/#contact" },
-  { label: "HQ", href: "/hq" },
 ];
 
 export function Navbar() {
