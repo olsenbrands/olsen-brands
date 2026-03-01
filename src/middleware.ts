@@ -31,9 +31,16 @@ export function middleware(request: NextRequest) {
   // Handle HQ routes
   if (isHQRoute) {
     const hqAuthCookie = request.cookies.get('hq-auth');
+    const botKey = request.headers.get('X-Bot-Key');
+    const HQ_PASSWORD = process.env.HQ_PASSWORD || '5421';
 
     // If this is a login attempt
     if (request.method === 'POST' && pathname === '/api/auth/login') {
+      return NextResponse.next();
+    }
+
+    // Allow API access with X-Bot-Key header
+    if (pathname.startsWith('/api/hq') && botKey === HQ_PASSWORD) {
       return NextResponse.next();
     }
 
