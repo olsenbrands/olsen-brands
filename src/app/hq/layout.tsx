@@ -15,7 +15,8 @@ import {
   Clock,
   Calendar,
   ArrowLeft,
-  Users
+  Users,
+  BookOpen
 } from 'lucide-react';
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { href: '/hq/vault', label: 'Vault', icon: Archive },
   { href: '/hq/missions', label: 'Missions', icon: Target },
   { href: '/hq/intel', label: 'Intel', icon: Radio },
+  { href: '/hq/journal', label: 'Journal', icon: BookOpen },
 ];
 
 export default function HQLayout({
