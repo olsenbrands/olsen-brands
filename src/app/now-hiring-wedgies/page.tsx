@@ -362,13 +362,13 @@ export default function NowHiringWedgiesPage() {
                       className={`w-full flex items-center justify-between px-4 py-3 rounded-lg border text-sm font-semibold transition-all ${
                         isActive
                           ? 'bg-[#c9533c]/10 border-[#c9533c]/30 text-[#efe5cd]'
-                          : 'bg-white/[0.02] border-white/[0.06] text-[#efe5cd]/40 hover:border-white/10 hover:text-[#efe5cd]/60'
+                          : 'bg-white/[0.02] border-white/[0.06] text-[#efe5cd]/80 hover:border-[#efe5cd]/50 hover:text-[#efe5cd]'
                       }`}
                     >
                       <span>{day}</span>
                       <span
                         className={`w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all ${
-                          isActive ? 'border-[#c9533c] bg-[#c9533c]' : 'border-white/20'
+                          isActive ? 'border-[#c9533c] bg-[#c9533c]' : 'border-[#efe5cd]/50'
                         }`}
                       >
                         {isActive && (
@@ -392,7 +392,7 @@ export default function NowHiringWedgiesPage() {
                           onChange={(e) => updateDayTime(day, 'start', e.target.value)}
                           className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                         />
-                        <span className="text-[#efe5cd]/30 text-xs">to</span>
+                        <span className="text-[#efe5cd]/70 text-xs">to</span>
                         <input
                           type="time"
                           value={availability[day]!.end}
@@ -409,7 +409,7 @@ export default function NowHiringWedgiesPage() {
 
           {/* Resume Upload */}
           <section className="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
-            <h2 className="text-lg font-bold text-[#efe5cd] mb-1">Upload Resume</h2>
+            <h2 className="text-lg font-bold text-[#efe5cd] mb-1">Upload Resume <span className="text-sm font-normal text-[#efe5cd]/50">(optional)</span></h2>
             <p className="text-xs text-[#efe5cd]/70 mb-4">PDF or Word document (optional)</p>
 
             <input
@@ -448,7 +448,7 @@ export default function NowHiringWedgiesPage() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="w-full flex flex-col items-center gap-2 py-8 border-2 border-dashed border-white/10 rounded-xl text-[#efe5cd]/30 hover:border-[#c9533c]/30 hover:text-[#efe5cd]/50 transition-all cursor-pointer"
+                className="w-full flex flex-col items-center gap-2 py-8 border-2 border-dashed border-white/10 rounded-xl text-[#efe5cd]/70 hover:border-[#c9533c]/40 hover:text-[#efe5cd] transition-all cursor-pointer"
               >
                 <Upload size={24} />
                 <span className="text-sm font-medium">Click to upload</span>
@@ -480,7 +480,7 @@ export default function NowHiringWedgiesPage() {
             )}
           </button>
 
-          <p className="text-center text-xs text-[#efe5cd]/30">
+          <p className="text-center text-xs text-[#efe5cd]/50">
             Your information is kept private and only used for the hiring process.
           </p>
         </form>
@@ -499,7 +499,7 @@ export default function NowHiringWedgiesPage() {
         </div>
 
         <div className="mt-8 text-center">
-          <p className="text-xs text-[#efe5cd]/20">
+          <p className="text-xs text-[#efe5cd]/40">
             Wedgie&apos;s · 2212 W 1800 N Ste. B, Clinton, UT · ilovewedgies.com
           </p>
         </div>
