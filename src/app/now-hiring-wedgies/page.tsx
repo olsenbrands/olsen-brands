@@ -174,7 +174,7 @@ export default function NowHiringWedgiesPage() {
             <h2 className="text-lg font-bold text-[#efe5cd] mb-4">Personal Information</h2>
             <div className="grid sm:grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-[#efe5cd]/40 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs text-[#efe5cd]/80 uppercase tracking-wider mb-1.5">
                   First Name <span className="text-[#c9533c]">*</span>
                 </label>
                 <input
@@ -182,12 +182,12 @@ export default function NowHiringWedgiesPage() {
                   required
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-3 text-[#efe5cd] placeholder-[#efe5cd]/20 focus:outline-none focus:border-[#c9533c]/50 transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                   placeholder="First name"
                 />
               </div>
               <div>
-                <label className="block text-xs text-[#efe5cd]/40 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs text-[#efe5cd]/80 uppercase tracking-wider mb-1.5">
                   Last Name <span className="text-[#c9533c]">*</span>
                 </label>
                 <input
@@ -195,12 +195,12 @@ export default function NowHiringWedgiesPage() {
                   required
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-3 text-[#efe5cd] placeholder-[#efe5cd]/20 focus:outline-none focus:border-[#c9533c]/50 transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                   placeholder="Last name"
                 />
               </div>
               <div>
-                <label className="block text-xs text-[#efe5cd]/40 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs text-[#efe5cd]/80 uppercase tracking-wider mb-1.5">
                   Phone <span className="text-[#c9533c]">*</span>
                 </label>
                 <input
@@ -208,12 +208,12 @@ export default function NowHiringWedgiesPage() {
                   required
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-3 text-[#efe5cd] placeholder-[#efe5cd]/20 focus:outline-none focus:border-[#c9533c]/50 transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                   placeholder="(801) 555-1234"
                 />
               </div>
               <div>
-                <label className="block text-xs text-[#efe5cd]/40 uppercase tracking-wider mb-1.5">
+                <label className="block text-xs text-[#efe5cd]/80 uppercase tracking-wider mb-1.5">
                   Email <span className="text-[#c9533c]">*</span>
                 </label>
                 <input
@@ -221,7 +221,7 @@ export default function NowHiringWedgiesPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-3 text-[#efe5cd] placeholder-[#efe5cd]/20 focus:outline-none focus:border-[#c9533c]/50 transition-colors"
+                  className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                   placeholder="you@email.com"
                 />
               </div>
@@ -231,7 +231,7 @@ export default function NowHiringWedgiesPage() {
           {/* Age Range */}
           <section className="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-[#efe5cd] mb-1">What is your age range?</h2>
-            <p className="text-xs text-[#efe5cd]/40 mb-4">Required for scheduling and compliance</p>
+            <p className="text-xs text-[#efe5cd]/70 mb-4">Required for scheduling and compliance</p>
             <div className="flex flex-wrap gap-3">
               {['15 or younger', '16 to 18', '19+'].map((range) => (
                 <button
@@ -258,12 +258,12 @@ export default function NowHiringWedgiesPage() {
             <h2 className="text-lg font-bold text-[#efe5cd] mb-1">
               Why would you like to work at Wedgie&apos;s?
             </h2>
-            <p className="text-xs text-[#efe5cd]/40 mb-4">Tell us a little about yourself</p>
+            <p className="text-xs text-[#efe5cd]/70 mb-4">Tell us a little about yourself</p>
             <textarea
               value={whyWorkHere}
               onChange={(e) => setWhyWorkHere(e.target.value)}
               rows={4}
-              className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-3 text-[#efe5cd] placeholder-[#efe5cd]/20 focus:outline-none focus:border-[#c9533c]/50 transition-colors resize-none"
+              className="w-full bg-white border border-gray-200 rounded-lg px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors resize-none"
               placeholder="What excites you about working here?"
             />
           </section>
@@ -271,7 +271,7 @@ export default function NowHiringWedgiesPage() {
           {/* Work Experience */}
           <section className="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-[#efe5cd] mb-1">Previous Work Experience</h2>
-            <p className="text-xs text-[#efe5cd]/40 mb-4">Add your recent jobs (optional)</p>
+            <p className="text-xs text-[#efe5cd]/70 mb-4">Add your recent jobs (optional)</p>
 
             <div className="space-y-4">
               {workExperience.map((entry, index) => (
@@ -280,7 +280,7 @@ export default function NowHiringWedgiesPage() {
                   className="bg-white/[0.02] border border-white/[0.06] rounded-xl p-4 space-y-3"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs text-[#efe5cd]/30 font-semibold uppercase tracking-wider">
+                    <span className="text-xs text-[#efe5cd]/70 font-semibold uppercase tracking-wider">
                       Job {index + 1}
                     </span>
                     {workExperience.length > 1 && (
@@ -297,30 +297,30 @@ export default function NowHiringWedgiesPage() {
                     type="text"
                     value={entry.location}
                     onChange={(e) => updateWorkEntry(index, 'location', e.target.value)}
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[#efe5cd] placeholder-[#efe5cd]/20 focus:outline-none focus:border-[#c9533c]/50 transition-colors"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                     placeholder="Company / Location"
                   />
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-[10px] text-[#efe5cd]/30 uppercase tracking-wider mb-1">
+                      <label className="block text-[10px] text-[#efe5cd]/70 uppercase tracking-wider mb-1">
                         Start Date
                       </label>
                       <input
                         type="month"
                         value={entry.startDate}
                         onChange={(e) => updateWorkEntry(index, 'startDate', e.target.value)}
-                        className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-[#efe5cd] focus:outline-none focus:border-[#c9533c]/50 transition-colors [color-scheme:dark]"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                       />
                     </div>
                     <div>
-                      <label className="block text-[10px] text-[#efe5cd]/30 uppercase tracking-wider mb-1">
+                      <label className="block text-[10px] text-[#efe5cd]/70 uppercase tracking-wider mb-1">
                         End Date
                       </label>
                       <input
                         type="month"
                         value={entry.endDate}
                         onChange={(e) => updateWorkEntry(index, 'endDate', e.target.value)}
-                        className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-3 py-2 text-sm text-[#efe5cd] focus:outline-none focus:border-[#c9533c]/50 transition-colors [color-scheme:dark]"
+                        className="w-full bg-white border border-gray-200 rounded-lg px-3 py-2 text-sm text-gray-900 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                       />
                     </div>
                   </div>
@@ -328,7 +328,7 @@ export default function NowHiringWedgiesPage() {
                     value={entry.duties}
                     onChange={(e) => updateWorkEntry(index, 'duties', e.target.value)}
                     rows={2}
-                    className="w-full bg-white/[0.05] border border-white/10 rounded-lg px-4 py-2.5 text-sm text-[#efe5cd] placeholder-[#efe5cd]/20 focus:outline-none focus:border-[#c9533c]/50 transition-colors resize-none"
+                    className="w-full bg-white border border-gray-200 rounded-lg px-4 py-2.5 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors resize-none"
                     placeholder="Job duties"
                   />
                 </div>
@@ -347,7 +347,7 @@ export default function NowHiringWedgiesPage() {
           {/* Availability */}
           <section className="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-[#efe5cd] mb-1">What is your availability?</h2>
-            <p className="text-xs text-[#efe5cd]/40 mb-4">
+            <p className="text-xs text-[#efe5cd]/70 mb-4">
               Tap the days you&apos;re available, then set your hours
             </p>
 
@@ -390,14 +390,14 @@ export default function NowHiringWedgiesPage() {
                           type="time"
                           value={availability[day]!.start}
                           onChange={(e) => updateDayTime(day, 'start', e.target.value)}
-                          className="bg-white/[0.05] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-[#efe5cd] focus:outline-none focus:border-[#c9533c]/50 transition-colors [color-scheme:dark]"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                         />
                         <span className="text-[#efe5cd]/30 text-xs">to</span>
                         <input
                           type="time"
                           value={availability[day]!.end}
                           onChange={(e) => updateDayTime(day, 'end', e.target.value)}
-                          className="bg-white/[0.05] border border-white/10 rounded-lg px-3 py-1.5 text-sm text-[#efe5cd] focus:outline-none focus:border-[#c9533c]/50 transition-colors [color-scheme:dark]"
+                          className="bg-white border border-gray-200 rounded-lg px-3 py-1.5 text-sm text-gray-900 focus:outline-none focus:border-[#c9533c] focus:ring-1 focus:ring-[#c9533c]/30 transition-colors"
                         />
                       </div>
                     )}
@@ -410,7 +410,7 @@ export default function NowHiringWedgiesPage() {
           {/* Resume Upload */}
           <section className="bg-white/[0.03] border border-white/10 rounded-2xl p-6">
             <h2 className="text-lg font-bold text-[#efe5cd] mb-1">Upload Resume</h2>
-            <p className="text-xs text-[#efe5cd]/40 mb-4">PDF or Word document (optional)</p>
+            <p className="text-xs text-[#efe5cd]/70 mb-4">PDF or Word document (optional)</p>
 
             <input
               ref={fileInputRef}
