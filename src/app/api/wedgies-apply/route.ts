@@ -2,9 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
 import sgMail from '@sendgrid/mail';
 
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-}
+// API key is set per-request to ensure env var is available at runtime
 
 export async function POST(req: NextRequest) {
   try {
@@ -85,6 +83,10 @@ export async function POST(req: NextRequest) {
 
     // Send emails (non-blocking — don't fail the submission if email fails)
     try {
+      const sgKey = process.env.SENDGRID_API_KEY;
+      console.log('[wedgies-apply] SENDGRID_API_KEY present:', !!sgKey, '| length:', sgKey?.length ?? 0);
+      if (!sgKey) throw new Error('SENDGRID_API_KEY is not set in environment');
+      sgMail.setApiKey(sgKey);
       console.log('[wedgies-apply] Sending notification email to jordan@olsenbrands.com + wedgiesclinton@gmail.com');
       await sendNotificationEmail({
         firstName,
