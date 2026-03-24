@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 
-const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
 type FormData = {
   interview_date: string;
@@ -23,6 +23,7 @@ type FormData = {
   unavailable_days: string[];
   unavailable_reason: string;
   future_commitments: string;
+  availability_notes: string;
   night_crew_preference: string;
   day_crew_preference: string;
   available_saturday_events: string;
@@ -54,7 +55,7 @@ const empty: FormData = {
   age_group: '', employment_type: '',
   why_subway: '', prior_experience: '', learned_from_experience: '', hobbies: '',
   available_days: [], available_times: {},
-  unavailable_days: [], unavailable_reason: '', future_commitments: '',
+  unavailable_days: [], unavailable_reason: '', future_commitments: '', availability_notes: '',
   night_crew_preference: '', day_crew_preference: '',
   available_saturday_events: '', available_early_730: '', days_per_week: '',
   biggest_strength: '', biggest_struggle: '', struggle_reason: '', one_year_goal: '',
@@ -160,6 +161,7 @@ function generatePDF(form: FormData) {
     }
     field('Reason Not Available', form.unavailable_reason);
     field('Future Commitments', form.future_commitments);
+    field('Availability Notes', form.availability_notes);
 
     // Shift Preference
     section('Shift Preference');
@@ -477,6 +479,9 @@ export default function SubwayInterviewPage() {
 
           <Field label="Future commitments that could interfere with work?">
             <Textarea value={form.future_commitments} onChange={v => set('future_commitments', v)} rows={2} />
+          </Field>
+          <Field label="Availability Notes">
+            <Textarea value={form.availability_notes} onChange={v => set('availability_notes', v)} rows={2} placeholder="e.g. Said Sundays are flexible, needs off during soccer season in fall..." />
           </Field>
         </Card>
 

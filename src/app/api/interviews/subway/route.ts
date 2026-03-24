@@ -11,7 +11,7 @@ export async function POST(req: NextRequest) {
       'interview_date', 'name', 'phone', 'email', 'shirt_size', 'school', 'grade',
       'age_group', 'employment_type', 'why_subway', 'prior_experience',
       'learned_from_experience', 'hobbies', 'available_days', 'available_times',
-      'unavailable_days', 'unavailable_reason', 'future_commitments',
+      'unavailable_days', 'unavailable_reason', 'future_commitments', 'availability_notes',
       'night_crew_preference', 'day_crew_preference', 'available_saturday_events',
       'available_early_730', 'days_per_week', 'biggest_strength', 'biggest_struggle',
       'struggle_reason', 'one_year_goal', 'can_lift_50lbs', 'can_stand_4_6hrs',
