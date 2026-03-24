@@ -83,7 +83,7 @@ export async function POST(req: NextRequest) {
 
     // Send emails (non-blocking — don't fail the submission if email fails)
     try {
-      const sgKey = process.env.SENDGRID_API_KEY;
+      const sgKey = process.env.SENDGRID_API_KEY?.trim();
       console.log('[wedgies-apply] SENDGRID_API_KEY present:', !!sgKey, '| length:', sgKey?.length ?? 0);
       if (!sgKey) throw new Error('SENDGRID_API_KEY is not set in environment');
       sgMail.setApiKey(sgKey);
