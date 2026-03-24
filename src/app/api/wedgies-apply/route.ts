@@ -85,6 +85,7 @@ export async function POST(req: NextRequest) {
 
     // Send emails (non-blocking — don't fail the submission if email fails)
     try {
+      console.log('[wedgies-apply] Sending notification email to jordan@olsenbrands.com + wedgiesclinton@gmail.com');
       await sendNotificationEmail({
         firstName,
         lastName,
@@ -96,10 +97,16 @@ export async function POST(req: NextRequest) {
         availability,
         resumeAttachment,
       });
+      console.log('[wedgies-apply] Notification email sent successfully');
 
+      console.log('[wedgies-apply] Sending confirmation email to', email);
       await sendConfirmationEmail({ firstName, email });
-    } catch (emailErr) {
-      console.error('Email send error (non-blocking):', emailErr);
+      console.log('[wedgies-apply] Confirmation email sent successfully');
+    } catch (emailErr: any) {
+      console.error('[wedgies-apply] Email send FAILED:', emailErr?.message || emailErr);
+      if (emailErr?.response?.body) {
+        console.error('[wedgies-apply] SendGrid error body:', JSON.stringify(emailErr.response.body));
+      }
     }
 
     return NextResponse.json({ success: true, id: data.id });
