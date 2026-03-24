@@ -38,6 +38,7 @@ type FormData = {
   good_leader: string;
   coworker_pet_peeve: string;
   rule_following_score: string;
+  rule_following_notes: string;
   favorite_subway_sandwich: string;
   offered_base_wage: string;
   offered_total_wage: string;
@@ -59,7 +60,7 @@ const empty: FormData = {
   biggest_strength: '', biggest_struggle: '', struggle_reason: '', one_year_goal: '',
   can_lift_50lbs: '', can_stand_4_6hrs: '',
   not_busy_behavior: '', good_leader: '', coworker_pet_peeve: '',
-  rule_following_score: '', favorite_subway_sandwich: '',
+  rule_following_score: '', rule_following_notes: '', favorite_subway_sandwich: '',
   offered_base_wage: '', offered_total_wage: '', wage_works_for_candidate: '',
   interviewer_notes: '', hired: false, star_rating: 0,
 };
@@ -180,6 +181,7 @@ function generatePDF(form: FormData) {
     field('What Makes a Good Leader?', form.good_leader);
     field('Biggest Co-worker Pet-peeve', form.coworker_pet_peeve);
     field('Rule Following Score (1–10)', form.rule_following_score);
+    field('Rule Following Notes', form.rule_following_notes);
     field('Favorite Subway Sandwich', form.favorite_subway_sandwich);
 
     // Offer
@@ -557,6 +559,9 @@ export default function SubwayInterviewPage() {
                 </button>
               ))}
             </div>
+          </Field>
+          <Field label="Notes on rule-following answer">
+            <Input value={form.rule_following_notes} onChange={v => set('rule_following_notes', v)} placeholder="e.g. Said they always follow rules but struggled to give an example..." />
           </Field>
           <Field label="Favorite Subway sandwich?">
             <Input value={form.favorite_subway_sandwich} onChange={v => set('favorite_subway_sandwich', v)} placeholder="e.g. Italian BMT" />
