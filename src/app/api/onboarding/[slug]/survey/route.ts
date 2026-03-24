@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
+import { Resend } from 'resend';
 
 function buildSurveyEmail({
   firstName,
@@ -402,9 +403,11 @@ export async function POST(
     return NextResponse.json({ error: 'Failed to save survey.' }, { status: 500 });
   }
 
-  // Fire both emails in parallel if SendGrid is configured
-  const sendgridKey = process.env.SENDGRID_API_KEY;
-  if (sendgridKey && business) {
+  // Fire both emails in parallel if Resend is configured
+  const resendKey = process.env.RESEND_API_KEY?.trim();
+  if (resendKey && business) {
+    const resend = new Resend(resendKey);
+
     // ── 1. Jordan's survey notification ───────────────────────────────────
     const surveyEmail = buildSurveyEmail({
       firstName: firstName || '',
@@ -418,19 +421,13 @@ export async function POST(
       heardFrom: heardFrom ?? null,
     });
 
-    const sendSurveyEmail = fetch('https://api.sendgrid.com/v3/mail/send', {
-      method: 'POST',
-      headers: { 'Authorization': `Bearer ${sendgridKey}`, 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        personalizations: [{ to: [{ email: 'jordan@olsenbrands.com' }] }],
-        from: { email: 'onboarding@olsenbrands.com', name: 'OlsenBrands Onboarding' },
-        subject: `Onboarding feedback — ${firstName} at ${business.name} (${rating}/5)`,
-        content: [
-          { type: 'text/plain', value: surveyEmail.text },
-          { type: 'text/html', value: surveyEmail.html },
-        ],
-      }),
-    }).catch((e) => console.error('SendGrid survey email failed:', e));
+    const sendSurveyEmail = resend.emails.send({
+      to: 'jordan@olsenbrands.com',
+      from: 'OlsenBrands Onboarding <onboarding@olsenbrands.com>',
+      subject: `Onboarding feedback — ${firstName} at ${business.name} (${rating}/5)`,
+      text: surveyEmail.text,
+      html: surveyEmail.html,
+    }).catch((e: unknown) => console.error('Resend survey email failed:', e));
 
     // ── 2. Employee confirmation email ─────────────────────────────────────
     let sendConfirmationEmail: Promise<unknown> = Promise.resolve();
@@ -486,21 +483,13 @@ export async function POST(
           .update({ confirmation_email_sent_at: new Date().toISOString() })
           .eq('id', employeeId);
 
-        sendConfirmationEmail = fetch('https://api.sendgrid.com/v3/mail/send', {
-          method: 'POST',
-          headers: { 'Authorization': `Bearer ${sendgridKey}`, 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            personalizations: [{ to: [{ email: employeeEmail }] }],
-            from: { email: 'onboarding@olsenbrands.com', name: 'OlsenBrands Onboarding' },
-            subject: `Welcome to ${business.name} — your onboarding is complete ✅`,
-            custom_args: { employee_id: employeeId }, // used by webhook to match open events
-            tracking_settings: { open_tracking: { enable: true } },
-            content: [
-              { type: 'text/plain', value: confirmEmail.text },
-              { type: 'text/html', value: confirmEmail.html },
-            ],
-          }),
-        }).catch((e) => console.error('SendGrid confirmation email failed:', e));
+        sendConfirmationEmail = resend.emails.send({
+          to: employeeEmail,
+          from: 'OlsenBrands Onboarding <onboarding@olsenbrands.com>',
+          subject: `Welcome to ${business.name} — your onboarding is complete ✅`,
+          text: confirmEmail.text,
+          html: confirmEmail.html,
+        }).catch((e: unknown) => console.error('Resend confirmation email failed:', e));
       }
     }
 

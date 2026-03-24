@@ -1,8 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import sgMail from '@sendgrid/mail';
-
-// API key is set per-request to ensure env var is available at runtime
+import { Resend } from 'resend';
 
 export async function POST(req: NextRequest) {
   try {
@@ -83,12 +81,13 @@ export async function POST(req: NextRequest) {
 
     // Send emails (non-blocking — don't fail the submission if email fails)
     try {
-      const sgKey = process.env.SENDGRID_API_KEY?.trim();
-      console.log('[wedgies-apply] SENDGRID_API_KEY present:', !!sgKey, '| length:', sgKey?.length ?? 0);
-      if (!sgKey) throw new Error('SENDGRID_API_KEY is not set in environment');
-      sgMail.setApiKey(sgKey);
+      const resendKey = process.env.RESEND_API_KEY?.trim();
+      console.log('[wedgies-apply] RESEND_API_KEY present:', !!resendKey, '| length:', resendKey?.length ?? 0);
+      if (!resendKey) throw new Error('RESEND_API_KEY is not set in environment');
+      const resend = new Resend(resendKey);
+
       console.log('[wedgies-apply] Sending notification email to jordan@olsenbrands.com + wedgiesclinton@gmail.com');
-      await sendNotificationEmail({
+      await sendNotificationEmail(resend, {
         firstName,
         lastName,
         phone,
@@ -102,13 +101,10 @@ export async function POST(req: NextRequest) {
       console.log('[wedgies-apply] Notification email sent successfully');
 
       console.log('[wedgies-apply] Sending confirmation email to', email);
-      await sendConfirmationEmail({ firstName, email });
+      await sendConfirmationEmail(resend, { firstName, email });
       console.log('[wedgies-apply] Confirmation email sent successfully');
     } catch (emailErr: any) {
       console.error('[wedgies-apply] Email send FAILED:', emailErr?.message || emailErr);
-      if (emailErr?.response?.body) {
-        console.error('[wedgies-apply] SendGrid error body:', JSON.stringify(emailErr.response.body));
-      }
     }
 
     return NextResponse.json({ success: true, id: data.id });
@@ -132,7 +128,7 @@ interface NotificationData {
   resumeAttachment: { content: string; filename: string; type: string } | null;
 }
 
-async function sendNotificationEmail(data: NotificationData) {
+async function sendNotificationEmail(resend: Resend, data: NotificationData) {
   const workRows = data.workExperience
     .filter((w) => w.location)
     .map(
@@ -207,10 +203,9 @@ async function sendNotificationEmail(data: NotificationData) {
     </div>
   `;
 
-  const msg: sgMail.MailDataRequired = {
-    to: 'jordan@olsenbrands.com',
-    cc: 'wedgiesclinton@gmail.com',
-    from: { email: 'jordan@olsenbrands.com', name: "Wedgie's Hiring" },
+  await resend.emails.send({
+    to: ['jordan@olsenbrands.com', 'wedgiesclinton@gmail.com'],
+    from: "Wedgie's Hiring <onboarding@olsenbrands.com>",
     subject: `New Application: ${data.firstName} ${data.lastName} — Wedgie's`,
     html,
     ...(data.resumeAttachment
@@ -219,20 +214,17 @@ async function sendNotificationEmail(data: NotificationData) {
             {
               content: data.resumeAttachment.content,
               filename: data.resumeAttachment.filename,
-              type: data.resumeAttachment.type,
-              disposition: 'attachment' as const,
+              contentType: data.resumeAttachment.type,
             },
           ],
         }
       : {}),
-  };
-
-  await sgMail.send(msg);
+  });
 }
 
 // ─── Confirmation email to the applicant ────────────────────────
 
-async function sendConfirmationEmail({ firstName, email }: { firstName: string; email: string }) {
+async function sendConfirmationEmail(resend: Resend, { firstName, email }: { firstName: string; email: string }) {
   const html = `
     <div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;max-width:600px;margin:0 auto;color:#333;">
       <div style="background:#c9533c;padding:20px 24px;border-radius:12px 12px 0 0;">
@@ -271,12 +263,10 @@ async function sendConfirmationEmail({ firstName, email }: { firstName: string; 
     </div>
   `;
 
-  const msg: sgMail.MailDataRequired = {
+  await resend.emails.send({
     to: email,
-    from: { email: 'jordan@olsenbrands.com', name: "Wedgie's" },
+    from: "Wedgie's <onboarding@olsenbrands.com>",
     subject: "We got your application! — Wedgie's",
     html,
-  };
-
-  await sgMail.send(msg);
+  });
 }
