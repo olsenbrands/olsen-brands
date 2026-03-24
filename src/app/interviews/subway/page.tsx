@@ -44,6 +44,7 @@ type FormData = {
   offered_base_wage: string;
   offered_total_wage: string;
   wage_works_for_candidate: string;
+  why_right_person: string;
   interviewer_notes: string;
   hired: boolean;
   star_rating: number;
@@ -62,7 +63,7 @@ const empty: FormData = {
   can_lift_50lbs: '', can_stand_4_6hrs: '',
   not_busy_behavior: '', good_leader: '', coworker_pet_peeve: '',
   rule_following_score: '', rule_following_notes: '', favorite_subway_sandwich: '',
-  offered_base_wage: '', offered_total_wage: '', wage_works_for_candidate: '',
+  offered_base_wage: '', offered_total_wage: '', wage_works_for_candidate: '', why_right_person: '',
   interviewer_notes: '', hired: false, star_rating: 0,
 };
 
@@ -188,6 +189,7 @@ function generatePDF(form: FormData) {
 
     // Offer
     section('Offer');
+    field('Why Right Person for the Job?', form.why_right_person);
     field('Base Wage Offered', form.offered_base_wage);
     field('Total Wage with Tips', form.offered_total_wage);
     field('Wage Works for Candidate?', form.wage_works_for_candidate);
@@ -585,6 +587,13 @@ export default function SubwayInterviewPage() {
           </div>
           <Field label="Does this wage work for the candidate?">
             <RadioGroup options={['Yes', 'No']} value={form.wage_works_for_candidate} onChange={v => set('wage_works_for_candidate', v)} />
+          </Field>
+        </Card>
+
+        {/* ── Why Right Person ── */}
+        <Card title="Closing Question">
+          <Field label="Why do you think you're the right person for the job?">
+            <Textarea value={form.why_right_person} onChange={v => set('why_right_person', v)} rows={4} placeholder="Candidate's answer..." />
           </Field>
         </Card>
 
