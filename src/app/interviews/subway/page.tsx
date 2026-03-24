@@ -78,9 +78,11 @@ function generatePDF(form: FormData) {
     // Colors
     const charcoal: [number, number, number] = [26, 26, 26];
     const green: [number, number, number] = [58, 125, 68];
+    const orange: [number, number, number] = [224, 123, 53];
     const white: [number, number, number] = [255, 255, 255];
     const light: [number, number, number] = [247, 247, 245];
     const muted: [number, number, number] = [136, 136, 128];
+    const colors = { orange, green, charcoal };
 
     let y = 0;
 
@@ -198,9 +200,48 @@ function generatePDF(form: FormData) {
 
     // Internal
     section('Internal Notes');
-    field('Overall Rating', form.star_rating > 0 ? '★'.repeat(form.star_rating) + '☆'.repeat(5 - form.star_rating) + ` (${['','Poor','Fair','Good','Great','Excellent'][form.star_rating]})` : undefined);
+
+    // Draw stars as filled/half/empty circles — no unicode
+    if (form.star_rating > 0) {
+      if (y > 270) { doc.addPage(); y = 20; }
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(...muted);
+      doc.setFontSize(8);
+      doc.text('OVERALL RATING', 14, y);
+      y += 6;
+
+      const starX = 14;
+      const starR = 4;
+      const gap = 11;
+      const ratingLabel = form.star_rating <= 1 ? 'Poor' : form.star_rating <= 2 ? 'Fair' : form.star_rating <= 3 ? 'Good' : form.star_rating <= 4 ? 'Great' : 'Excellent';
+
+      for (let i = 1; i <= 5; i++) {
+        const cx = starX + (i - 1) * gap + starR;
+        const fill = form.star_rating >= i ? 1 : form.star_rating >= i - 0.5 ? 0.5 : 0;
+        if (fill === 1) {
+          doc.setFillColor(...colors.orange);
+          doc.circle(cx, y, starR, 'F');
+        } else if (fill === 0.5) {
+          // Half — filled left semicircle
+          doc.setFillColor(226, 226, 220);
+          doc.circle(cx, y, starR, 'F');
+          doc.setFillColor(...colors.orange);
+          doc.rect(cx - starR, y - starR, starR, starR * 2, 'F');
+          doc.circle(cx, y, starR, 'S');
+        } else {
+          doc.setFillColor(226, 226, 220);
+          doc.circle(cx, y, starR, 'F');
+        }
+      }
+      doc.setTextColor(...charcoal);
+      doc.setFont('helvetica', 'normal');
+      doc.setFontSize(10);
+      doc.text(`${form.star_rating}/5 — ${ratingLabel}`, starX + 5 * gap + 4, y + 1);
+      y += starR * 2 + 6;
+    }
+
     field('Interviewer Notes', form.interviewer_notes);
-    field('Hired?', form.hired ? 'Yes ✓' : undefined);
+    field('Hired?', form.hired ? 'Yes - HIRED' : undefined);
 
     doc.save(`Subway_Interview_${name.replace(/\s+/g, '_')}_${date}.pdf`);
   });
@@ -605,21 +646,38 @@ export default function SubwayInterviewPage() {
         {/* ── Internal Notes ── */}
         <Card title="Internal Notes">
           <Field label="Overall Rating">
-            <div className="flex gap-2">
+            <div className="flex items-center gap-1">
               {[1, 2, 3, 4, 5].map(star => (
-                <button
-                  key={star}
-                  type="button"
-                  onClick={() => set('star_rating', form.star_rating === star ? 0 : star)}
-                  className="text-3xl transition-transform hover:scale-110 focus:outline-none"
-                  title={['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][star]}
-                >
-                  <span className={star <= form.star_rating ? 'text-[#e07b35]' : 'text-[#d0d0cc]'}>★</span>
-                </button>
+                <div key={star} className="relative w-8 h-8 cursor-pointer flex-shrink-0">
+                  {/* Empty star base */}
+                  <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#d0d0cc]">★</span>
+                  {/* Full star overlay */}
+                  {form.star_rating >= star && (
+                    <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#e07b35]">★</span>
+                  )}
+                  {/* Half star overlay */}
+                  {form.star_rating >= star - 0.5 && form.star_rating < star && (
+                    <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#e07b35] overflow-hidden" style={{ clipPath: 'inset(0 50% 0 0)' }}>★</span>
+                  )}
+                  {/* Left half click = half star */}
+                  <button
+                    type="button"
+                    className="absolute left-0 top-0 w-1/2 h-full z-10 focus:outline-none"
+                    onClick={() => set('star_rating', form.star_rating === star - 0.5 ? 0 : star - 0.5)}
+                    title={`${star - 0.5} stars`}
+                  />
+                  {/* Right half click = full star */}
+                  <button
+                    type="button"
+                    className="absolute right-0 top-0 w-1/2 h-full z-10 focus:outline-none"
+                    onClick={() => set('star_rating', form.star_rating === star ? 0 : star)}
+                    title={`${star} stars`}
+                  />
+                </div>
               ))}
               {form.star_rating > 0 && (
-                <span className="self-center text-sm font-semibold text-[#888880] ml-1">
-                  {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][form.star_rating]}
+                <span className="ml-2 text-sm font-semibold text-[#888880]">
+                  {form.star_rating}/5 — {form.star_rating <= 1 ? 'Poor' : form.star_rating <= 2 ? 'Fair' : form.star_rating <= 3 ? 'Good' : form.star_rating <= 4 ? 'Great' : 'Excellent'}
                 </span>
               )}
             </div>
