@@ -13,6 +13,7 @@ type FormData = {
   school: string;
   grade: string;
   age_group: string;
+  age_notes: string;
   employment_type: string;
   why_subway: string;
   prior_experience: string;
@@ -53,7 +54,7 @@ type FormData = {
 const empty: FormData = {
   interview_date: new Date().toISOString().split('T')[0],
   name: '', phone: '', email: '', shirt_size: '', school: '', grade: '',
-  age_group: '', employment_type: '',
+  age_group: '', age_notes: '', employment_type: '',
   why_subway: '', prior_experience: '', learned_from_experience: '', hobbies: '',
   available_days: [], available_times: {},
   unavailable_days: [], unavailable_reason: '', future_commitments: '', availability_notes: '',
@@ -138,6 +139,7 @@ function generatePDF(form: FormData) {
     field('School', form.school);
     field('Grade', form.grade);
     field('Age Group', form.age_group);
+    field('Age Notes', form.age_notes);
     field('Employment Type', form.employment_type);
 
     // Interview Questions
@@ -395,6 +397,9 @@ export default function SubwayInterviewPage() {
           </div>
           <Field label="Age Group">
             <RadioGroup options={['15', '16/17', '18+']} value={form.age_group} onChange={v => set('age_group', v)} />
+          </Field>
+          <Field label="Age Notes">
+            <Input value={form.age_notes} onChange={v => set('age_notes', v)} placeholder="e.g. Turning 16 next month, has work permit..." />
           </Field>
           <Field label="Employment Type">
             <RadioGroup options={['Part-Time', 'Full-Time']} value={form.employment_type} onChange={v => set('employment_type', v)} />
