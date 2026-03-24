@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       'struggle_reason', 'one_year_goal', 'can_lift_50lbs', 'can_stand_4_6hrs',
       'not_busy_behavior', 'good_leader', 'coworker_pet_peeve', 'rule_following_score',
       'favorite_subway_sandwich', 'offered_base_wage', 'offered_total_wage',
-      'wage_works_for_candidate', 'interviewer_notes', 'hired',
+      'wage_works_for_candidate', 'interviewer_notes', 'hired', 'star_rating',
     ];
 
     for (const field of fields) {

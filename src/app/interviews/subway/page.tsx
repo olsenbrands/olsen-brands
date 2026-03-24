@@ -44,6 +44,7 @@ type FormData = {
   wage_works_for_candidate: string;
   interviewer_notes: string;
   hired: boolean;
+  star_rating: number;
 };
 
 const empty: FormData = {
@@ -60,7 +61,7 @@ const empty: FormData = {
   not_busy_behavior: '', good_leader: '', coworker_pet_peeve: '',
   rule_following_score: '', favorite_subway_sandwich: '',
   offered_base_wage: '', offered_total_wage: '', wage_works_for_candidate: '',
-  interviewer_notes: '', hired: false,
+  interviewer_notes: '', hired: false, star_rating: 0,
 };
 
 function generatePDF(form: FormData) {
@@ -189,6 +190,7 @@ function generatePDF(form: FormData) {
 
     // Internal
     section('Internal Notes');
+    field('Overall Rating', form.star_rating > 0 ? '★'.repeat(form.star_rating) + '☆'.repeat(5 - form.star_rating) + ` (${['','Poor','Fair','Good','Great','Excellent'][form.star_rating]})` : undefined);
     field('Interviewer Notes', form.interviewer_notes);
     field('Hired?', form.hired ? 'Yes ✓' : undefined);
 
@@ -578,6 +580,26 @@ export default function SubwayInterviewPage() {
 
         {/* ── Internal Notes ── */}
         <Card title="Internal Notes">
+          <Field label="Overall Rating">
+            <div className="flex gap-2">
+              {[1, 2, 3, 4, 5].map(star => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => set('star_rating', form.star_rating === star ? 0 : star)}
+                  className="text-3xl transition-transform hover:scale-110 focus:outline-none"
+                  title={['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][star]}
+                >
+                  <span className={star <= form.star_rating ? 'text-[#e07b35]' : 'text-[#d0d0cc]'}>★</span>
+                </button>
+              ))}
+              {form.star_rating > 0 && (
+                <span className="self-center text-sm font-semibold text-[#888880] ml-1">
+                  {['', 'Poor', 'Fair', 'Good', 'Great', 'Excellent'][form.star_rating]}
+                </span>
+              )}
+            </div>
+          </Field>
           <Field label="Interviewer Notes (private)">
             <Textarea value={form.interviewer_notes} onChange={v => set('interviewer_notes', v)} rows={4} placeholder="Your private notes about this candidate..." />
           </Field>
