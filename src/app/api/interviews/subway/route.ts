@@ -8,7 +8,7 @@ export async function POST(req: NextRequest) {
     // Strip undefined values — all fields optional
     const record: Record<string, unknown> = {};
     const fields = [
-      'interview_date', 'name', 'phone', 'email', 'shirt_size', 'school', 'grade',
+      'business', 'interview_date', 'name', 'phone', 'email', 'shirt_size', 'school', 'grade',
       'age_group', 'age_notes', 'employment_type', 'why_subway', 'prior_experience',
       'learned_from_experience', 'hobbies', 'available_days', 'available_times',
       'unavailable_days', 'unavailable_reason', 'future_commitments', 'availability_notes',
@@ -18,6 +18,7 @@ export async function POST(req: NextRequest) {
       'not_busy_behavior', 'good_leader', 'coworker_pet_peeve', 'rule_following_score', 'rule_following_notes',
       'favorite_subway_sandwich', 'offered_base_wage', 'offered_total_wage',
       'wage_works_for_candidate', 'why_right_person', 'interviewer_notes', 'hired', 'star_rating',
+      'status', 'rejection_notes',
     ];
 
     for (const field of fields) {

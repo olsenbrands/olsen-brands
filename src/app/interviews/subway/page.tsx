@@ -4,7 +4,18 @@ import { useState } from 'react';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
+const BUSINESSES = [
+  'Subway — Kaysville',
+  'Subway — Morgan',
+  'Subway — Ogden',
+  "Wedgie's — Clinton",
+  'FiiZ — Clinton',
+  'FiiZ — Kaysville East',
+  'FiiZ — Kaysville West',
+];
+
 type FormData = {
+  business: string;
   interview_date: string;
   name: string;
   phone: string;
@@ -52,6 +63,7 @@ type FormData = {
 };
 
 const empty: FormData = {
+  business: 'Subway — Kaysville',
   interview_date: new Date().toISOString().split('T')[0],
   name: '', phone: '', email: '', shirt_size: '', school: '', grade: '',
   age_group: '', age_notes: '', employment_type: '',
@@ -92,11 +104,11 @@ function generatePDF(form: FormData) {
     doc.setTextColor(...white);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('SUBWAY INTERVIEW', 14, 14);
+    doc.text('INTERVIEW QUESTIONNAIRE', 14, 14);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.text(name, 14, 22);
-    doc.text(date, 196, 22, { align: 'right' });
+    doc.text(`${form.business || ''} · ${date}`, 196, 22, { align: 'right' });
     y = 42;
 
     const section = (title: string) => {
@@ -401,6 +413,28 @@ export default function SubwayInterviewPage() {
             <p className="font-bold text-[#c62828] text-sm">Something went wrong — try again.</p>
           </div>
         )}
+
+        {/* ── Business Selector ── */}
+        <Card title="Location">
+          <Field label="Which location is this interview for?">
+            <div className="flex flex-wrap gap-2">
+              {BUSINESSES.map(b => (
+                <button
+                  key={b}
+                  type="button"
+                  onClick={() => set('business', b)}
+                  className={`px-3 py-2 rounded-lg text-sm font-medium border transition ${
+                    form.business === b
+                      ? 'bg-[#1a1a1a] border-[#1a1a1a] text-white'
+                      : 'bg-white border-[#e8e8e4] text-[#555550] hover:border-[#3a7d44]'
+                  }`}
+                >
+                  {b}
+                </button>
+              ))}
+            </div>
+          </Field>
+        </Card>
 
         {/* ── Candidate Info ── */}
         <Card title="Candidate Information">
