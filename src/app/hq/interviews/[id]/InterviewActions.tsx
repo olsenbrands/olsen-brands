@@ -44,6 +44,9 @@ export default function InterviewActions({ interview }: { interview: Interview }
   const [welcomeSentAt, setWelcomeSentAt] = useState(interview.welcome_sent_at || '');
   const [sendingWelcome, setSendingWelcome] = useState(false);
   const [welcomeMsg, setWelcomeMsg] = useState('');
+  const [showPreview, setShowPreview] = useState(false);
+  const [previewHtml, setPreviewHtml] = useState('');
+  const [loadingPreview, setLoadingPreview] = useState(false);
 
   // Calculate effective wage
   const baseNum = parseFloat(hourlyBase.replace(/[^0-9.]/g, ''));
@@ -110,6 +113,19 @@ export default function InterviewActions({ interview }: { interview: Interview }
     });
   };
 
+  const openPreview = async () => {
+    setLoadingPreview(true);
+    setShowPreview(true);
+    const res = await fetch('/api/interviews/subway/preview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: interview.id, hourlyBase, tipAmount, posPin, trainingUsername, trainingPassword }),
+    });
+    const html = await res.text();
+    setPreviewHtml(html);
+    setLoadingPreview(false);
+  };
+
   const sendWelcomeEmail = async () => {
     setSendingWelcome(true);
     setWelcomeMsg('');
@@ -131,6 +147,7 @@ export default function InterviewActions({ interview }: { interview: Interview }
   };
 
   return (
+    <>
     <div className="bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl p-5 mb-4 space-y-4">
 
       {/* Business selector */}
@@ -339,13 +356,21 @@ export default function InterviewActions({ interview }: { interview: Interview }
             <p className="text-xs text-amber-600 font-semibold mb-3">⚠️ No email address on file — add one to send the welcome email.</p>
           )}
 
-          <button
-            onClick={sendWelcomeEmail}
-            disabled={sendingWelcome || !interview.email}
-            className="w-full py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition"
-          >
-            {sendingWelcome ? 'Sending…' : welcomeSentAt ? '✓ Resend Welcome Email' : '📧 Send Welcome Email'}
-          </button>
+          <div className="flex gap-2">
+            <button
+              onClick={openPreview}
+              className="flex-1 py-2.5 bg-[var(--bg-tertiary)] hover:bg-[var(--border)] border border-[var(--border)] text-[var(--text-primary)] rounded-lg text-sm font-bold transition"
+            >
+              👁 Preview Email
+            </button>
+            <button
+              onClick={sendWelcomeEmail}
+              disabled={sendingWelcome || !interview.email}
+              className="flex-1 py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition"
+            >
+              {sendingWelcome ? 'Sending…' : welcomeSentAt ? '✓ Resend' : '📧 Send'}
+            </button>
+          </div>
 
           {welcomeSentAt && !welcomeMsg && (
             <p className="text-xs text-[var(--text-muted)] mt-1.5">
@@ -382,5 +407,47 @@ export default function InterviewActions({ interview }: { interview: Interview }
       {saved && <p className="text-xs text-green-600 font-semibold">✓ Saved</p>}
       {saving && <p className="text-xs text-[var(--text-muted)]">Saving…</p>}
     </div>
+
+    {/* Preview Modal */}
+    
+    {showPreview && (
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60" onClick={() => setShowPreview(false)}>
+        <div
+          className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col overflow-hidden"
+          onClick={e => e.stopPropagation()}
+        >
+          {/* Modal header */}
+          <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 flex-shrink-0">
+            <div>
+              <p className="font-bold text-gray-900 text-sm">Email Preview</p>
+              <p className="text-xs text-gray-500 mt-0.5">To: {interview.email || '(no email)'}</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => { setShowPreview(false); sendWelcomeEmail(); }}
+                disabled={sendingWelcome || !interview.email}
+                className="px-4 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition"
+              >
+                {sendingWelcome ? 'Sending…' : '📧 Send Now'}
+              </button>
+              <button onClick={() => setShowPreview(false)} className="p-2 hover:bg-gray-100 rounded-lg transition text-gray-500 text-lg leading-none">✕</button>
+            </div>
+          </div>
+          {/* Email iframe */}
+          <div className="flex-1 overflow-auto">
+            {loadingPreview ? (
+              <div className="flex items-center justify-center h-64 text-gray-400 text-sm">Loading preview…</div>
+            ) : (
+              <iframe
+                srcDoc={previewHtml}
+                className="w-full h-full min-h-[600px] border-0"
+                title="Email Preview"
+              />
+            )}
+          </div>
+        </div>
+      </div>
+    )}
+    </>
   );
 }
