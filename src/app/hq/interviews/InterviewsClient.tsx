@@ -79,9 +79,12 @@ export default function InterviewsClient({
   // Batch mode
   const [batchMode, setBatchMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [batchAction, setBatchAction] = useState<'location' | 'archive' | null>(null);
+  const [batchAction, setBatchAction] = useState<'location' | 'archive' | 'rating' | null>(null);
   const [batchLocation, setBatchLocation] = useState('');
   const [showBatchLocationPicker, setShowBatchLocationPicker] = useState(false);
+  const [showBatchRatingPicker, setShowBatchRatingPicker] = useState(false);
+  const [batchRating, setBatchRating] = useState<number>(0);
+  const [batchRatingHover, setBatchRatingHover] = useState<number>(0);
   const [saving, setSaving] = useState(false);
   const [saveMsg, setSaveMsg] = useState('');
 
@@ -111,7 +114,28 @@ export default function InterviewsClient({
     setSelected(new Set());
     setBatchAction(null);
     setBatchLocation('');
+    setBatchRating(0);
     setShowBatchLocationPicker(false);
+    setShowBatchRatingPicker(false);
+  };
+
+  const applyBatchRating = async () => {
+    if (!batchRating || selected.size === 0) return;
+    setSaving(true);
+    setSaveMsg('');
+    await Promise.all(
+      [...selected].map(id =>
+        fetch(`/api/interviews/subway/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ star_rating: batchRating }),
+        })
+      )
+    );
+    setSaving(false);
+    setSaveMsg(`✓ Rated ${selected.size} record${selected.size > 1 ? 's' : ''} — ${batchRating}★`);
+    exitBatch();
+    startTransition(() => router.refresh());
   };
 
   const applyBatchArchive = async () => {
@@ -183,6 +207,7 @@ export default function InterviewsClient({
                   onClick={() => {
                     setBatchAction('location');
                     setShowBatchLocationPicker(v => !v);
+                    setShowBatchRatingPicker(false);
                   }}
                   disabled={selected.size === 0}
                   className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--accent)] text-white disabled:opacity-40 transition"
@@ -219,6 +244,63 @@ export default function InterviewsClient({
                   </div>
                 )}
               </div>
+              {/* Batch rating */}
+              <div className="relative">
+                <button
+                  onClick={() => { setShowBatchRatingPicker(v => !v); setShowBatchLocationPicker(false); }}
+                  disabled={selected.size === 0}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-[#e07b35] hover:border-[#e07b35] disabled:opacity-40 transition"
+                >
+                  ★ Set Rating <ChevronDown size={14} />
+                </button>
+                {showBatchRatingPicker && (
+                  <div className="absolute top-full left-0 mt-1 z-50 bg-[var(--bg-secondary)] border border-[var(--border)] rounded-xl shadow-xl p-4 min-w-[220px]">
+                    <p className="text-xs font-bold uppercase tracking-wider text-[var(--text-muted)] mb-3">Set rating for {selected.size} selected</p>
+                    <div className="flex items-center gap-1 mb-3">
+                      {[1,2,3,4,5].map(star => (
+                        <div key={star} className="relative w-9 h-9 flex-shrink-0">
+                          <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#d0d0cc]">★</span>
+                          {(batchRatingHover || batchRating) >= star && (
+                            <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#e07b35]">★</span>
+                          )}
+                          {(batchRatingHover || batchRating) >= star - 0.5 && (batchRatingHover || batchRating) < star && (
+                            <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#e07b35] overflow-hidden" style={{ clipPath: 'inset(0 50% 0 0)' }}>★</span>
+                          )}
+                          <button
+                            type="button"
+                            className="absolute left-0 top-0 w-1/2 h-full z-10 focus:outline-none"
+                            onMouseEnter={() => setBatchRatingHover(star - 0.5)}
+                            onMouseLeave={() => setBatchRatingHover(0)}
+                            onClick={() => setBatchRating(batchRating === star - 0.5 ? 0 : star - 0.5)}
+                          />
+                          <button
+                            type="button"
+                            className="absolute right-0 top-0 w-1/2 h-full z-10 focus:outline-none"
+                            onMouseEnter={() => setBatchRatingHover(star)}
+                            onMouseLeave={() => setBatchRatingHover(0)}
+                            onClick={() => setBatchRating(batchRating === star ? 0 : star)}
+                          />
+                        </div>
+                      ))}
+                      {(batchRating > 0) && (
+                        <span className="ml-1 text-xs font-semibold text-[var(--text-muted)]">
+                          {batchRating}/5
+                        </span>
+                      )}
+                    </div>
+                    {batchRating > 0 && (
+                      <button
+                        onClick={applyBatchRating}
+                        disabled={saving}
+                        className="w-full py-2 bg-[#e07b35] hover:bg-[#c96a2a] text-white rounded-lg text-sm font-bold transition"
+                      >
+                        {saving ? 'Saving…' : `Apply ${batchRating}★ to ${selected.size} record${selected.size !== 1 ? 's' : ''}`}
+                      </button>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <button
                 onClick={applyBatchArchive}
                 disabled={saving || selected.size === 0}
