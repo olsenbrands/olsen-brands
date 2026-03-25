@@ -47,6 +47,10 @@ export default function InterviewActions({ interview }: { interview: Interview }
   const [showPreview, setShowPreview] = useState(false);
   const [previewHtml, setPreviewHtml] = useState('');
   const [loadingPreview, setLoadingPreview] = useState(false);
+  const [showTestSend, setShowTestSend] = useState(false);
+  const [testEmail, setTestEmail] = useState('jordan@olsenbrands.com');
+  const [sendingTest, setSendingTest] = useState(false);
+  const [testMsg, setTestMsg] = useState('');
 
   // Calculate effective wage
   const baseNum = parseFloat(hourlyBase.replace(/[^0-9.]/g, ''));
@@ -111,6 +115,22 @@ export default function InterviewActions({ interview }: { interview: Interview }
       training_username: trainingUsername || null,
       training_password: trainingPassword || null,
     });
+  };
+
+  const sendTestEmail = async () => {
+    if (!testEmail) return;
+    setSendingTest(true);
+    setTestMsg('');
+    await saveWelcomePackage();
+    const res = await fetch('/api/interviews/subway/welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: interview.id, testOverrideTo: testEmail }),
+    });
+    const json = await res.json();
+    setSendingTest(false);
+    setTestMsg(json.success ? `✓ Test sent to ${testEmail}` : `❌ ${json.error || 'Failed'}`);
+    setShowTestSend(false);
   };
 
   const openPreview = async () => {
@@ -361,7 +381,7 @@ export default function InterviewActions({ interview }: { interview: Interview }
               onClick={openPreview}
               className="flex-1 py-2.5 bg-[var(--bg-tertiary)] hover:bg-[var(--border)] border border-[var(--border)] text-[var(--text-primary)] rounded-lg text-sm font-bold transition"
             >
-              👁 Preview Email
+              👁 Preview
             </button>
             <button
               onClick={sendWelcomeEmail}
@@ -371,6 +391,33 @@ export default function InterviewActions({ interview }: { interview: Interview }
               {sendingWelcome ? 'Sending…' : welcomeSentAt ? '✓ Resend' : '📧 Send'}
             </button>
           </div>
+          <button
+            onClick={() => setShowTestSend(true)}
+            className="w-full py-2 text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-dashed border-[var(--border)] rounded-lg transition"
+          >
+            Send test email to myself
+          </button>
+          {showTestSend && (
+            <div className="flex gap-2 items-center">
+              <input
+                value={testEmail}
+                onChange={e => setTestEmail(e.target.value)}
+                placeholder="your@email.com"
+                className="flex-1 bg-[var(--bg-primary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+              />
+              <button
+                onClick={sendTestEmail}
+                disabled={sendingTest || !testEmail}
+                className="px-4 py-2 bg-[var(--accent)] hover:opacity-90 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition whitespace-nowrap"
+              >
+                {sendingTest ? 'Sending…' : 'Send Test'}
+              </button>
+              <button onClick={() => setShowTestSend(false)} className="text-[var(--text-muted)] hover:text-[var(--text-primary)] text-lg leading-none px-1">✕</button>
+            </div>
+          )}
+          {testMsg && (
+            <p className={`text-xs font-semibold ${testMsg.startsWith('✓') ? 'text-green-600' : 'text-red-500'}`}>{testMsg}</p>
+          )}
 
           {welcomeSentAt && !welcomeMsg && (
             <p className="text-xs text-[var(--text-muted)] mt-1.5">

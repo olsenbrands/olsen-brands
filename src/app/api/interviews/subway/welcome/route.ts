@@ -13,7 +13,9 @@ const LOCATION_NAMES: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
   try {
-    const { id } = await req.json();
+    const body = await req.json();
+    const { id, testOverrideTo } = body;
+    const isTest = !!testOverrideTo;
     if (!id) return NextResponse.json({ error: 'Missing id' }, { status: 400 });
 
     // Fetch the interview
@@ -27,7 +29,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Interview not found' }, { status: 404 });
     }
 
-    if (!interview.email) {
+    const recipientEmail = testOverrideTo || interview.email;
+    if (!recipientEmail) {
       return NextResponse.json({ error: 'No email address on file for this candidate' }, { status: 400 });
     }
 
@@ -56,9 +59,11 @@ export async function POST(req: NextRequest) {
 
     const resend = new Resend(process.env.RESEND_API_KEY?.trim());
     const { error: sendErr } = await resend.emails.send({
-      to: interview.email,
+      to: recipientEmail,
       from: 'Jordan Olsen <onboarding@olsenbrands.com>',
-      subject: `Welcome to Subway at ${locationName}! 🎉`,
+      subject: isTest
+        ? `[TEST] Welcome to Subway at ${locationName}! 🎉`
+        : `Welcome to Subway at ${locationName}! 🎉`,
       html,
     });
 
@@ -67,11 +72,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
     }
 
-    // Stamp sent time
-    await supabase
-      .from('subway_interviews')
-      .update({ welcome_sent_at: new Date().toISOString() })
-      .eq('id', id);
+    // Only stamp sent time for real sends, not tests
+    if (!isTest) {
+      await supabase
+        .from('subway_interviews')
+        .update({ welcome_sent_at: new Date().toISOString() })
+        .eq('id', id);
+    }
 
     return NextResponse.json({ success: true });
   } catch (err) {
