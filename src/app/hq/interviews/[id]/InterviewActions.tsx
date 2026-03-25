@@ -16,6 +16,7 @@ interface Interview {
   rejection_notes?: string | null;
   name?: string | null;
   archived_at?: string | null;
+  star_rating?: number | null;
 }
 
 export default function InterviewActions({ interview }: { interview: Interview }) {
@@ -25,6 +26,8 @@ export default function InterviewActions({ interview }: { interview: Interview }
   const [rejectionNotes, setRejectionNotes] = useState(interview.rejection_notes || '');
   const [showDNH, setShowDNH] = useState(false);
   const [archived, setArchived] = useState(!!interview.archived_at);
+  const [starRating, setStarRating] = useState<number>(interview.star_rating ?? 0);
+  const [starHover, setStarHover] = useState<number>(0);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -95,6 +98,51 @@ export default function InterviewActions({ interview }: { interview: Interview }
               {b}
             </button>
           ))}
+        </div>
+      </div>
+
+      {/* Star rating */}
+      <div>
+        <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-2">Rating</p>
+        <div className="flex items-center gap-1">
+          {[1,2,3,4,5].map(star => (
+            <div key={star} className="relative w-9 h-9 flex-shrink-0">
+              <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#d0d0cc]">★</span>
+              {(starHover || starRating) >= star && (
+                <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#e07b35]">★</span>
+              )}
+              {(starHover || starRating) >= star - 0.5 && (starHover || starRating) < star && (
+                <span className="absolute inset-0 flex items-center justify-center text-3xl leading-none text-[#e07b35] overflow-hidden" style={{ clipPath: 'inset(0 50% 0 0)' }}>★</span>
+              )}
+              <button
+                type="button"
+                className="absolute left-0 top-0 w-1/2 h-full z-10 focus:outline-none"
+                onMouseEnter={() => setStarHover(star - 0.5)}
+                onMouseLeave={() => setStarHover(0)}
+                onClick={async () => {
+                  const val = starRating === star - 0.5 ? 0 : star - 0.5;
+                  setStarRating(val);
+                  await update({ star_rating: val || null });
+                }}
+              />
+              <button
+                type="button"
+                className="absolute right-0 top-0 w-1/2 h-full z-10 focus:outline-none"
+                onMouseEnter={() => setStarHover(star)}
+                onMouseLeave={() => setStarHover(0)}
+                onClick={async () => {
+                  const val = starRating === star ? 0 : star;
+                  setStarRating(val);
+                  await update({ star_rating: val || null });
+                }}
+              />
+            </div>
+          ))}
+          {starRating > 0 && (
+            <span className="ml-2 text-sm font-semibold text-[var(--text-muted)]">
+              {starRating}/5 — {starRating <= 1 ? 'Poor' : starRating <= 2 ? 'Fair' : starRating <= 3 ? 'Good' : starRating <= 4 ? 'Great' : 'Excellent'}
+            </span>
+          )}
         </div>
       </div>
 
