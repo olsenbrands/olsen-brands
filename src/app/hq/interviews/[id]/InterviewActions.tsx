@@ -17,6 +17,13 @@ interface Interview {
   name?: string | null;
   archived_at?: string | null;
   star_rating?: number | null;
+  email?: string | null;
+  hourly_base?: string | null;
+  tip_amount?: string | null;
+  pos_pin?: string | null;
+  training_username?: string | null;
+  training_password?: string | null;
+  welcome_sent_at?: string | null;
 }
 
 export default function InterviewActions({ interview }: { interview: Interview }) {
@@ -26,6 +33,22 @@ export default function InterviewActions({ interview }: { interview: Interview }
   const [rejectionNotes, setRejectionNotes] = useState(interview.rejection_notes || '');
   const [showDNH, setShowDNH] = useState(false);
   const [archived, setArchived] = useState(!!interview.archived_at);
+  const isSubway = (interview.business || '').toLowerCase().includes('subway');
+
+  // Welcome package fields
+  const [hourlyBase, setHourlyBase] = useState(interview.hourly_base || '');
+  const [tipAmount, setTipAmount] = useState(interview.tip_amount || '');
+  const [posPin, setPosPin] = useState(interview.pos_pin || '');
+  const [trainingUsername, setTrainingUsername] = useState(interview.training_username || '');
+  const [trainingPassword, setTrainingPassword] = useState(interview.training_password || '');
+  const [welcomeSentAt, setWelcomeSentAt] = useState(interview.welcome_sent_at || '');
+  const [sendingWelcome, setSendingWelcome] = useState(false);
+  const [welcomeMsg, setWelcomeMsg] = useState('');
+
+  // Calculate effective wage
+  const baseNum = parseFloat(hourlyBase.replace(/[^0-9.]/g, ''));
+  const tipNum = parseFloat(tipAmount.replace(/[^0-9.]/g, ''));
+  const effectiveWage = !isNaN(baseNum) && !isNaN(tipNum) ? `$${(baseNum + tipNum).toFixed(2)}` : null;
   const [starRating, setStarRating] = useState<number>(interview.star_rating ?? 0);
   const [starHover, setStarHover] = useState<number>(0);
   const [saving, setSaving] = useState(false);
@@ -75,6 +98,36 @@ export default function InterviewActions({ interview }: { interview: Interview }
   const handleUnarchive = async () => {
     setArchived(false);
     await update({ archived_at: null });
+  };
+
+  const saveWelcomePackage = async () => {
+    await update({
+      hourly_base: hourlyBase || null,
+      tip_amount: tipAmount || null,
+      pos_pin: posPin || null,
+      training_username: trainingUsername || null,
+      training_password: trainingPassword || null,
+    });
+  };
+
+  const sendWelcomeEmail = async () => {
+    setSendingWelcome(true);
+    setWelcomeMsg('');
+    await saveWelcomePackage();
+    const res = await fetch('/api/interviews/subway/welcome', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: interview.id }),
+    });
+    const json = await res.json();
+    setSendingWelcome(false);
+    if (json.success) {
+      const now = new Date().toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+      setWelcomeSentAt(new Date().toISOString());
+      setWelcomeMsg(`✓ Welcome email sent at ${now}`);
+    } else {
+      setWelcomeMsg(`❌ ${json.error || 'Failed to send'}`);
+    }
   };
 
   return (
@@ -211,6 +264,101 @@ export default function InterviewActions({ interview }: { interview: Interview }
           </div>
         )}
       </div>
+
+      {/* Welcome Package — only when hired */}
+      {status === 'hired' && (
+        <div className="border-t border-[var(--border)] pt-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-[var(--text-muted)] mb-3">Welcome Package</p>
+
+          <div className="grid grid-cols-2 gap-3 mb-3">
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">Base Hourly Pay</label>
+              <input
+                value={hourlyBase}
+                onChange={e => setHourlyBase(e.target.value)}
+                onBlur={saveWelcomePackage}
+                placeholder="$13.00"
+                className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">Guaranteed Tips / hr</label>
+              <input
+                value={tipAmount}
+                onChange={e => setTipAmount(e.target.value)}
+                onBlur={saveWelcomePackage}
+                placeholder="$1.00"
+                className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+              />
+            </div>
+          </div>
+
+          {effectiveWage && (
+            <p className="text-sm font-semibold text-green-600 mb-3">
+              → Effective wage: <strong>{effectiveWage}+/hr</strong>
+            </p>
+          )}
+
+          <div className="mb-3">
+            <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">POS Pin Number</label>
+            <input
+              value={posPin}
+              onChange={e => setPosPin(e.target.value)}
+              onBlur={saveWelcomePackage}
+              placeholder="e.g. 288"
+              className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+            />
+          </div>
+
+          {isSubway && (
+            <div className="grid grid-cols-2 gap-3 mb-3">
+              <div>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">UoS Username</label>
+                <input
+                  value={trainingUsername}
+                  onChange={e => setTrainingUsername(e.target.value)}
+                  onBlur={saveWelcomePackage}
+                  placeholder="e.g. JaneSmith4060"
+                  className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-[var(--text-muted)] uppercase tracking-wider mb-1">UoS Password</label>
+                <input
+                  value={trainingPassword}
+                  onChange={e => setTrainingPassword(e.target.value)}
+                  onBlur={saveWelcomePackage}
+                  placeholder="e.g. JaneS4060"
+                  className="w-full bg-[var(--bg-primary)] border border-[var(--border)] rounded-lg px-3 py-2 text-sm text-[var(--text-primary)] placeholder-[var(--text-muted)] focus:outline-none focus:ring-2 focus:ring-[var(--accent)] transition"
+                />
+              </div>
+            </div>
+          )}
+
+          {!interview.email && (
+            <p className="text-xs text-amber-600 font-semibold mb-3">⚠️ No email address on file — add one to send the welcome email.</p>
+          )}
+
+          <button
+            onClick={sendWelcomeEmail}
+            disabled={sendingWelcome || !interview.email}
+            className="w-full py-2.5 bg-green-600 hover:bg-green-700 disabled:opacity-40 text-white rounded-lg text-sm font-bold transition"
+          >
+            {sendingWelcome ? 'Sending…' : welcomeSentAt ? '✓ Resend Welcome Email' : '📧 Send Welcome Email'}
+          </button>
+
+          {welcomeSentAt && !welcomeMsg && (
+            <p className="text-xs text-[var(--text-muted)] mt-1.5">
+              Last sent: {new Date(welcomeSentAt).toLocaleString('en-US', { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' })}
+            </p>
+          )}
+          {welcomeMsg && (
+            <p className={`text-xs mt-1.5 font-semibold ${welcomeMsg.startsWith('✓') ? 'text-green-600' : 'text-red-500'}`}>
+              {welcomeMsg}
+            </p>
+          )}
+        </div>
+      )}
 
       {/* Archive */}
       <div className="border-t border-[var(--border)] pt-3">

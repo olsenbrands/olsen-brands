@@ -43,7 +43,7 @@ export default async function InterviewDetailPage({ params }: { params: Promise<
 
   const { data: interview, error } = await supabase
     .from('subway_interviews')
-    .select('*')
+    .select('*, hourly_base, tip_amount, pos_pin, training_username, training_password, welcome_sent_at')
     .eq('id', id)
     .single();
 
