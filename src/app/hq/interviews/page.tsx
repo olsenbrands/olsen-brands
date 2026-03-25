@@ -16,22 +16,36 @@ export default async function InterviewsPage({
 
   let query = supabase
     .from('subway_interviews')
-    .select('id, name, phone, email, age_group, business, interview_date, star_rating, status, hired, created_at')
+    .select('id, name, phone, email, age_group, business, interview_date, star_rating, status, hired, archived_at, created_at')
     .order('interview_date', { ascending: false })
     .order('created_at', { ascending: false });
 
+  // Show archived only when explicitly requested; otherwise hide them
+  if (filterStatus === 'archived') {
+    query = query.not('archived_at', 'is', null);
+  } else {
+    query = query.is('archived_at', null);
+    if (filterStatus) query = query.eq('status', filterStatus);
+  }
   if (filterBusiness) query = query.eq('business', filterBusiness);
-  if (filterStatus) query = query.eq('status', filterStatus);
 
   const { data: interviews, error } = await query;
   if (error) return <div className="p-8 text-red-400">Error: {error.message}</div>;
 
   const all = interviews ?? [];
+
+  // Get archived count separately
+  const { count: archivedCount } = await supabase
+    .from('subway_interviews')
+    .select('id', { count: 'exact', head: true })
+    .not('archived_at', 'is', null);
+
   const counts = {
     all: all.length,
     new: all.filter(i => i.status === 'new' || !i.status).length,
     hired: all.filter(i => i.status === 'hired').length,
     rejected: all.filter(i => i.status === 'rejected').length,
+    archived: archivedCount ?? 0,
   };
 
   const businesses = [
@@ -67,6 +81,7 @@ export default async function InterviewsPage({
           { label: `New (${counts.new})`, value: 'new' },
           { label: `Hired (${counts.hired})`, value: 'hired' },
           { label: `No Hire (${counts.rejected})`, value: 'rejected' },
+          { label: `Archived (${counts.archived})`, value: 'archived' },
         ].map(tab => (
           <Link
             key={tab.value}

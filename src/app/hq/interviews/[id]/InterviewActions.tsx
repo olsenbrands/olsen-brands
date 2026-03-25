@@ -15,6 +15,7 @@ interface Interview {
   business: string | null;
   rejection_notes?: string | null;
   name?: string | null;
+  archived_at?: string | null;
 }
 
 export default function InterviewActions({ interview }: { interview: Interview }) {
@@ -23,6 +24,7 @@ export default function InterviewActions({ interview }: { interview: Interview }
   const [business, setBusiness] = useState(interview.business || '');
   const [rejectionNotes, setRejectionNotes] = useState(interview.rejection_notes || '');
   const [showDNH, setShowDNH] = useState(false);
+  const [archived, setArchived] = useState(!!interview.archived_at);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
 
@@ -60,6 +62,16 @@ export default function InterviewActions({ interview }: { interview: Interview }
   const handleReopen = async () => {
     setStatus('new');
     await update({ status: 'new', hired: false });
+  };
+
+  const handleArchive = async () => {
+    setArchived(true);
+    await update({ archived_at: new Date().toISOString() });
+  };
+
+  const handleUnarchive = async () => {
+    setArchived(false);
+    await update({ archived_at: null });
   };
 
   return (
@@ -148,6 +160,25 @@ export default function InterviewActions({ interview }: { interview: Interview }
                 Cancel
               </button>
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Archive */}
+      <div className="border-t border-[var(--border)] pt-3">
+        {!archived ? (
+          <button
+            onClick={handleArchive}
+            className="text-xs text-[var(--text-muted)] hover:text-red-500 transition underline"
+          >
+            Archive this interview
+          </button>
+        ) : (
+          <div className="flex items-center gap-3">
+            <span className="px-3 py-1 bg-[var(--bg-tertiary)] text-[var(--text-muted)] rounded-lg text-xs font-semibold">📦 Archived</span>
+            <button onClick={handleUnarchive} className="text-xs text-[var(--text-muted)] hover:text-[var(--text-primary)] underline">
+              Unarchive
+            </button>
           </div>
         )}
       </div>

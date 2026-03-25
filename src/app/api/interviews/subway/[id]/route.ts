@@ -9,7 +9,7 @@ export async function PATCH(
   const body = await req.json();
 
   const allowed = [
-    'business', 'status', 'hired', 'rejection_notes',
+    'business', 'status', 'hired', 'rejection_notes', 'archived_at',
     'star_rating', 'interviewer_notes',
     'name', 'phone', 'email', 'shirt_size', 'school', 'grade',
     'age_group', 'age_notes', 'employment_type', 'interview_date',

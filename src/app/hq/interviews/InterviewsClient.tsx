@@ -79,7 +79,7 @@ export default function InterviewsClient({
   // Batch mode
   const [batchMode, setBatchMode] = useState(false);
   const [selected, setSelected] = useState<Set<string>>(new Set());
-  const [batchAction, setBatchAction] = useState<'location' | null>(null);
+  const [batchAction, setBatchAction] = useState<'location' | 'archive' | null>(null);
   const [batchLocation, setBatchLocation] = useState('');
   const [showBatchLocationPicker, setShowBatchLocationPicker] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -112,6 +112,25 @@ export default function InterviewsClient({
     setBatchAction(null);
     setBatchLocation('');
     setShowBatchLocationPicker(false);
+  };
+
+  const applyBatchArchive = async () => {
+    if (selected.size === 0) return;
+    setSaving(true);
+    setSaveMsg('');
+    await Promise.all(
+      [...selected].map(id =>
+        fetch(`/api/interviews/subway/${id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ archived_at: new Date().toISOString() }),
+        })
+      )
+    );
+    setSaving(false);
+    setSaveMsg(`✓ Archived ${selected.size} record${selected.size > 1 ? 's' : ''}`);
+    exitBatch();
+    startTransition(() => router.refresh());
   };
 
   const applyBatchLocation = async () => {
@@ -200,6 +219,13 @@ export default function InterviewsClient({
                   </div>
                 )}
               </div>
+              <button
+                onClick={applyBatchArchive}
+                disabled={saving || selected.size === 0}
+                className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--bg-secondary)] border border-[var(--border)] text-[var(--text-secondary)] hover:text-red-500 hover:border-red-400 disabled:opacity-40 transition"
+              >
+                📦 Archive
+              </button>
               <button onClick={exitBatch} className="flex items-center gap-1 px-3 py-1.5 rounded-lg text-sm text-[var(--text-muted)] hover:text-[var(--text-primary)] border border-[var(--border)] transition">
                 <X size={14} /> Cancel
               </button>
