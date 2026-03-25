@@ -273,7 +273,7 @@ export default function InterviewsClient({
               {initial.map(i => (
                 <tr
                   key={i.id}
-                  onClick={() => batchMode ? toggleSelect(i.id) : navigate(`/hq/interviews/${i.id}`)}
+                  onClick={() => { if (batchMode) toggleSelect(i.id); else navigate(`/hq/interviews/${i.id}`); }}
                   className={`transition-colors cursor-pointer ${
                     batchMode && selected.has(i.id)
                       ? 'bg-[var(--accent)]/10'
@@ -281,12 +281,12 @@ export default function InterviewsClient({
                   }`}
                 >
                   {batchMode && (
-                    <td className="px-4 py-3" onClick={e => { e.stopPropagation(); toggleSelect(i.id); }}>
+                    <td className="px-4 py-3 w-10" onClick={e => e.stopPropagation()}>
                       <input
                         type="checkbox"
                         checked={selected.has(i.id)}
                         onChange={() => toggleSelect(i.id)}
-                        className="accent-[var(--accent)]"
+                        className="accent-[var(--accent)] cursor-pointer"
                       />
                     </td>
                   )}
