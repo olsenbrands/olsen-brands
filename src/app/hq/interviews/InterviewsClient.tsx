@@ -99,6 +99,7 @@ const ALL_COLUMNS = [
   { key: 'date',     label: 'Date',     always: false },
   { key: 'rating',   label: 'Rating',   always: false },
   { key: 'status',   label: 'Status',   always: false },
+  { key: 'wage',     label: 'Wage',     always: false },
   { key: 'decision', label: 'Decision', always: true },
 ];
 
@@ -128,6 +129,8 @@ interface Interview {
   status: string | null;
   hired: boolean | null;
   created_at: string;
+  offered_base_wage: number | null;
+  offered_total_wage: number | null;
 }
 
 export default function InterviewsClient({
@@ -144,7 +147,7 @@ export default function InterviewsClient({
 
   // Column visibility
   const [visibleCols, setVisibleCols] = useState<Set<string>>(
-    new Set(['name', 'contact', 'age', 'location', 'date', 'rating', 'status'])
+    new Set(['name', 'contact', 'age', 'location', 'date', 'rating', 'status', 'wage'])
   );
   const [showColPicker, setShowColPicker] = useState(false);
 
@@ -455,6 +458,7 @@ export default function InterviewsClient({
                 {show('date')     && <th className="px-4 py-3 text-left font-semibold hidden md:table-cell">Date</th>}
                 {show('rating')   && <th className="px-4 py-3 text-left font-semibold">Rating</th>}
                 {show('status')   && <th className="px-4 py-3 text-left font-semibold">Status</th>}
+                {show('wage')     && <th className="px-4 py-3 text-left font-semibold hidden sm:table-cell">Wage</th>}
                 <th className="px-4 py-3 text-right font-semibold">Decision</th>
               </tr>
             </thead>
@@ -512,6 +516,26 @@ export default function InterviewsClient({
                       <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold ${STATUS_STYLES[i.status || 'new'] || STATUS_STYLES.new}`}>
                         {STATUS_LABELS[i.status || 'new'] || 'New'}
                       </span>
+                    </td>
+                  )}
+                  {show('wage') && (
+                    <td className="px-4 py-3 hidden sm:table-cell">
+                      {i.offered_total_wage ? (
+                        <div>
+                          <span className="font-semibold text-[var(--text-primary)]">${i.offered_total_wage.toFixed(2)}</span>
+                          <span className="text-[var(--text-muted)] text-xs">/hr</span>
+                          {i.offered_base_wage && i.offered_base_wage !== i.offered_total_wage && (
+                            <p className="text-xs text-[var(--text-muted)] mt-0.5">${i.offered_base_wage.toFixed(2)} base</p>
+                          )}
+                        </div>
+                      ) : i.offered_base_wage ? (
+                        <div>
+                          <span className="font-semibold text-[var(--text-primary)]">${i.offered_base_wage.toFixed(2)}</span>
+                          <span className="text-[var(--text-muted)] text-xs">/hr</span>
+                        </div>
+                      ) : (
+                        <span className="text-[var(--text-muted)] text-xs">—</span>
+                      )}
                     </td>
                   )}
                   <td className="px-4 py-3 text-right" onClick={e => e.stopPropagation()}>

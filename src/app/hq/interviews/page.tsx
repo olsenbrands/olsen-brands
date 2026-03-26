@@ -16,7 +16,7 @@ export default async function InterviewsPage({
 
   let query = supabase
     .from('subway_interviews')
-    .select('id, name, phone, email, age_group, business, interview_date, star_rating, status, hired, archived_at, created_at')
+    .select('id, name, phone, email, age_group, business, interview_date, star_rating, status, hired, archived_at, created_at, offered_base_wage, offered_total_wage')
     .order('interview_date', { ascending: false })
     .order('created_at', { ascending: false });
 
