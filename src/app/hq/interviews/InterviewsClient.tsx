@@ -5,6 +5,77 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Columns, CheckSquare, X, ChevronDown } from 'lucide-react';
 
+type DecisionValue = 'pass' | 'decide' | 'hired';
+
+function mapStatusToDecision(status: string | null, hired: boolean | null): DecisionValue {
+  if (status === 'hired' || hired) return 'hired';
+  if (status === 'rejected') return 'pass';
+  return 'decide';
+}
+
+function DecisionToggle({
+  interviewId,
+  initial,
+  onChanged,
+}: {
+  interviewId: string;
+  initial: DecisionValue;
+  onChanged?: (id: string, val: DecisionValue) => void;
+}) {
+  const [value, setValue] = useState<DecisionValue>(initial);
+  const [saving, setSaving] = useState(false);
+
+  const options: { val: DecisionValue; label: string }[] = [
+    { val: 'pass',   label: 'Pass'   },
+    { val: 'decide', label: 'Decide' },
+    { val: 'hired',  label: 'Hired'  },
+  ];
+
+  const activeStyle: Record<DecisionValue, string> = {
+    pass:   'bg-red-500 text-white border-red-500',
+    decide: 'bg-yellow-400 text-gray-900 border-yellow-400',
+    hired:  'bg-green-500 text-white border-green-500',
+  };
+
+  const inactiveStyle = 'bg-transparent text-[var(--text-muted)] border-[var(--border)] hover:text-[var(--text-secondary)]';
+
+  const handleClick = async (e: React.MouseEvent, next: DecisionValue) => {
+    e.stopPropagation();
+    if (next === value || saving) return;
+    setValue(next);
+    setSaving(true);
+    onChanged?.(interviewId, next);
+    const payload =
+      next === 'hired'  ? { status: 'hired',    hired: true  } :
+      next === 'pass'   ? { status: 'rejected',  hired: false } :
+                          { status: 'new',        hired: false };
+    await fetch(`/api/interviews/subway/${interviewId}`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    });
+    setSaving(false);
+  };
+
+  return (
+    <div className={`inline-flex rounded-lg overflow-hidden border border-[var(--border)] transition-opacity ${saving ? 'opacity-60' : ''}`}>
+      {options.map((opt, idx) => (
+        <button
+          key={opt.val}
+          onClick={(e) => handleClick(e, opt.val)}
+          className={`px-2.5 py-1 text-xs font-semibold border-y transition-colors select-none
+            ${idx === 0 ? 'border-l rounded-l-lg' : ''}
+            ${idx === options.length - 1 ? 'border-r rounded-r-lg' : 'border-r'}
+            ${value === opt.val ? activeStyle[opt.val] : inactiveStyle}
+          `}
+        >
+          {opt.label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 const BUSINESSES = [
   'Subway — Kaysville', 'Subway — Morgan', 'Subway — Ogden',
   "Wedgie's — Clinton",
@@ -28,6 +99,7 @@ const ALL_COLUMNS = [
   { key: 'date',     label: 'Date',     always: false },
   { key: 'rating',   label: 'Rating',   always: false },
   { key: 'status',   label: 'Status',   always: false },
+  { key: 'decision', label: 'Decision', always: true },
 ];
 
 function StarDisplay({ rating }: { rating: number | null }) {
@@ -174,6 +246,14 @@ export default function InterviewsClient({
     setSaveMsg(`✓ Updated ${selected.size} record${selected.size > 1 ? 's' : ''}`);
     exitBatch();
     startTransition(() => router.refresh());
+  };
+
+  // Decision toggle local state
+  const [decisions, setDecisions] = useState<Record<string, DecisionValue>>(() =>
+    Object.fromEntries(initial.map(i => [i.id, mapStatusToDecision(i.status, i.hired)]))
+  );
+  const handleDecisionChanged = (id: string, val: DecisionValue) => {
+    setDecisions(prev => ({ ...prev, [id]: val }));
   };
 
   const show = (key: string) => visibleCols.has(key);
@@ -375,6 +455,7 @@ export default function InterviewsClient({
                 {show('date')     && <th className="px-4 py-3 text-left font-semibold hidden md:table-cell">Date</th>}
                 {show('rating')   && <th className="px-4 py-3 text-left font-semibold">Rating</th>}
                 {show('status')   && <th className="px-4 py-3 text-left font-semibold">Status</th>}
+                <th className="px-4 py-3 text-right font-semibold">Decision</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-[var(--border)]">
@@ -433,6 +514,13 @@ export default function InterviewsClient({
                       </span>
                     </td>
                   )}
+                  <td className="px-4 py-3 text-right" onClick={e => e.stopPropagation()}>
+                    <DecisionToggle
+                      interviewId={i.id}
+                      initial={decisions[i.id] ?? 'decide'}
+                      onChanged={handleDecisionChanged}
+                    />
+                  </td>
                 </tr>
               ))}
             </tbody>
