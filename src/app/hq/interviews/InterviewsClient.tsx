@@ -129,8 +129,8 @@ interface Interview {
   status: string | null;
   hired: boolean | null;
   created_at: string;
-  offered_base_wage: number | null;
-  offered_total_wage: number | null;
+  offered_base_wage: number | string | null;
+  offered_total_wage: number | string | null;
 }
 
 export default function InterviewsClient({
@@ -520,22 +520,26 @@ export default function InterviewsClient({
                   )}
                   {show('wage') && (
                     <td className="px-4 py-3 hidden sm:table-cell">
-                      {i.offered_total_wage ? (
-                        <div>
-                          <span className="font-semibold text-[var(--text-primary)]">${i.offered_total_wage.toFixed(2)}</span>
-                          <span className="text-[var(--text-muted)] text-xs">/hr</span>
-                          {i.offered_base_wage && i.offered_base_wage !== i.offered_total_wage && (
-                            <p className="text-xs text-[var(--text-muted)] mt-0.5">${i.offered_base_wage.toFixed(2)} base</p>
-                          )}
-                        </div>
-                      ) : i.offered_base_wage ? (
-                        <div>
-                          <span className="font-semibold text-[var(--text-primary)]">${i.offered_base_wage.toFixed(2)}</span>
-                          <span className="text-[var(--text-muted)] text-xs">/hr</span>
-                        </div>
-                      ) : (
-                        <span className="text-[var(--text-muted)] text-xs">—</span>
-                      )}
+                      {(() => {
+                        const total = i.offered_total_wage != null ? Number(i.offered_total_wage) : null;
+                        const base  = i.offered_base_wage  != null ? Number(i.offered_base_wage)  : null;
+                        if (total) return (
+                          <div>
+                            <span className="font-semibold text-[var(--text-primary)]">${total.toFixed(2)}</span>
+                            <span className="text-[var(--text-muted)] text-xs">/hr</span>
+                            {base && base !== total && (
+                              <p className="text-xs text-[var(--text-muted)] mt-0.5">${base.toFixed(2)} base</p>
+                            )}
+                          </div>
+                        );
+                        if (base) return (
+                          <div>
+                            <span className="font-semibold text-[var(--text-primary)]">${base.toFixed(2)}</span>
+                            <span className="text-[var(--text-muted)] text-xs">/hr</span>
+                          </div>
+                        );
+                        return <span className="text-[var(--text-muted)] text-xs">—</span>;
+                      })()}
                     </td>
                   )}
                   <td className="px-4 py-3 text-right" onClick={e => e.stopPropagation()}>
