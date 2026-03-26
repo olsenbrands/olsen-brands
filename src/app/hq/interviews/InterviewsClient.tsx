@@ -523,18 +523,18 @@ export default function InterviewsClient({
                       {(() => {
                         const total = i.offered_total_wage != null ? Number(i.offered_total_wage) : null;
                         const base  = i.offered_base_wage  != null ? Number(i.offered_base_wage)  : null;
-                        if (total) return (
-                          <div>
-                            <span className="font-semibold text-[var(--text-primary)]">${total.toFixed(2)}</span>
-                            <span className="text-[var(--text-muted)] text-xs">/hr</span>
-                            {base && base !== total && (
-                              <p className="text-xs text-[var(--text-muted)] mt-0.5">${base.toFixed(2)} base</p>
-                            )}
-                          </div>
-                        );
                         if (base) return (
                           <div>
                             <span className="font-semibold text-[var(--text-primary)]">${base.toFixed(2)}</span>
+                            <span className="text-[var(--text-muted)] text-xs">/hr</span>
+                            {total && total !== base && (
+                              <p className="text-xs text-[var(--text-muted)] mt-0.5">+${total.toFixed(2)} tips</p>
+                            )}
+                          </div>
+                        );
+                        if (total) return (
+                          <div>
+                            <span className="font-semibold text-[var(--text-primary)]">${total.toFixed(2)}</span>
                             <span className="text-[var(--text-muted)] text-xs">/hr</span>
                           </div>
                         );
