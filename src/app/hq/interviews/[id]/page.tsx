@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { ArrowLeft } from 'lucide-react';
 import InterviewActions from './InterviewActions';
+import { getInterviewBranding } from '@/lib/interview-branding';
 
 export const revalidate = 0;
 
@@ -52,6 +53,7 @@ export default async function InterviewDetailPage({ params }: { params: Promise<
   const availDays = (interview.available_days as string[] | null) || [];
   const unavailDays = (interview.unavailable_days as string[] | null) || [];
   const availTimes = (interview.available_times as Record<string, string> | null) || {};
+  const branding = getInterviewBranding(interview.business);
 
   return (
     <div className="p-6 max-w-3xl mx-auto">
@@ -105,7 +107,7 @@ export default async function InterviewDetailPage({ params }: { params: Promise<
 
       {/* Interview Questions */}
       <Section title="Interview Questions">
-        <Row label="Why Subway?" value={interview.why_subway} />
+        <Row label={branding.workQuestionShort} value={interview.why_subway} />
         <Row label="Prior Experience" value={interview.prior_experience} />
         <Row label="What Did You Learn?" value={interview.learned_from_experience} />
         <Row label="Hobbies" value={interview.hobbies} />
@@ -163,7 +165,7 @@ export default async function InterviewDetailPage({ params }: { params: Promise<
         <Row label="Pet Peeve" value={interview.coworker_pet_peeve} />
         <Row label="Rule Following Score" value={interview.rule_following_score ? `${interview.rule_following_score}/10` : null} />
         <Row label="Rule Following Notes" value={interview.rule_following_notes} />
-        <Row label="Fav Sandwich" value={interview.favorite_subway_sandwich} />
+        <Row label={branding.favoriteItemLabel} value={interview.favorite_subway_sandwich} />
       </Section>
 
       {/* Offer */}

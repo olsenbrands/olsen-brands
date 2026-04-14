@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getInterviewBranding } from '@/lib/interview-branding';
 
 const DAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
 
@@ -81,6 +82,7 @@ const empty: FormData = {
 };
 
 function generatePDF(form: FormData) {
+  const branding = getInterviewBranding(form.business);
   // Dynamic import to avoid SSR issues
   import('jspdf').then(({ jsPDF }) => {
     const doc = new jsPDF();
@@ -104,7 +106,7 @@ function generatePDF(form: FormData) {
     doc.setTextColor(...white);
     doc.setFontSize(18);
     doc.setFont('helvetica', 'bold');
-    doc.text('INTERVIEW QUESTIONNAIRE', 14, 14);
+    doc.text(branding.interviewTitle, 14, 14);
     doc.setFontSize(11);
     doc.setFont('helvetica', 'normal');
     doc.text(name, 14, 22);
@@ -158,7 +160,7 @@ function generatePDF(form: FormData) {
 
     // Interview Questions
     section('Interview Questions');
-    field('Why Subway?', form.why_subway);
+    field(branding.workQuestionShort, form.why_subway);
     field('Prior Work Experience', form.prior_experience);
     field('What Did You Learn?', form.learned_from_experience);
     field('Hobbies & Activities', form.hobbies);
@@ -201,7 +203,7 @@ function generatePDF(form: FormData) {
     field('Biggest Co-worker Pet-peeve', form.coworker_pet_peeve);
     field('Rule Following Score (1–10)', form.rule_following_score);
     field('Rule Following Notes', form.rule_following_notes);
-    field('Favorite Subway Sandwich', form.favorite_subway_sandwich);
+    field(branding.favoriteItemLabel, form.favorite_subway_sandwich);
 
     // Offer
     section('Offer');
@@ -255,7 +257,7 @@ function generatePDF(form: FormData) {
     field('Interviewer Notes', form.interviewer_notes);
     field('Hired?', form.hired ? 'Yes - HIRED' : undefined);
 
-    doc.save(`Subway_Interview_${name.replace(/\s+/g, '_')}_${date}.pdf`);
+    doc.save(`${branding.pdfFilePrefix}_Interview_${name.replace(/\s+/g, '_')}_${date}.pdf`);
   });
 }
 
@@ -344,6 +346,7 @@ function Field({ label, children }: { label: string; children: React.ReactNode }
 
 export default function SubwayInterviewPage() {
   const [form, setForm] = useState<FormData>(empty);
+  const branding = getInterviewBranding(form.business);
   const [status, setStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [savedId, setSavedId] = useState<string | null>(null);
 
@@ -389,7 +392,7 @@ export default function SubwayInterviewPage() {
       <div className="bg-[#1a1a1a] px-6 py-8">
         <div className="max-w-2xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest text-[#555550] mb-2">OlsenBrands · Internal Tool</p>
-          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-1">Subway Interview</h1>
+          <h1 className="text-3xl font-extrabold text-white tracking-tight mb-1">{branding.brandName} Interview</h1>
           <p className="text-[#888880] text-sm">Fill in as much or as little as needed. Everything is optional.</p>
         </div>
       </div>
@@ -483,7 +486,7 @@ export default function SubwayInterviewPage() {
 
         {/* ── Interview Questions ── */}
         <Card title="Interview Questions">
-          <Field label="Why do you want to work at Subway?">
+          <Field label={branding.workQuestion}>
             <Textarea value={form.why_subway} onChange={v => set('why_subway', v)} rows={3} />
           </Field>
           <Field label="What is your prior work experience?">
@@ -596,7 +599,7 @@ export default function SubwayInterviewPage() {
 
         {/* ── Personal / Behavioral ── */}
         <Card title="Personal &amp; Behavioral">
-          <Field label="What is your biggest strength at Subway?">
+          <Field label={branding.strengthQuestion}>
             <Textarea value={form.biggest_strength} onChange={v => set('biggest_strength', v)} rows={2} />
           </Field>
           <Field label="What do you struggle with most?">
@@ -650,8 +653,8 @@ export default function SubwayInterviewPage() {
           <Field label="Notes on rule-following answer">
             <Input value={form.rule_following_notes} onChange={v => set('rule_following_notes', v)} placeholder="e.g. Said they always follow rules but struggled to give an example..." />
           </Field>
-          <Field label="Favorite Subway sandwich?">
-            <Input value={form.favorite_subway_sandwich} onChange={v => set('favorite_subway_sandwich', v)} placeholder="e.g. Italian BMT" />
+          <Field label={branding.favoriteItemQuestion}>
+            <Input value={form.favorite_subway_sandwich} onChange={v => set('favorite_subway_sandwich', v)} placeholder={branding.favoriteItemPlaceholder} />
           </Field>
         </Card>
 
